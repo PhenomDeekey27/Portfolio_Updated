@@ -22,9 +22,9 @@ const projectsList: ProjectItem[] = [
   },
   {
     title: 'PhenomCommerce',
-    img: '/assets/PhenomCommerce.png',
-    lang: ['Html', 'Css', 'Javascript', 'React', 'ReduxToolkit', 'MongoDb', 'Express', 'NodeJs'],
-    redirect: 'https://phenom-commerce.onrender.com',
+    img: '/assets/phenomCommerce.png',
+    lang: ['Next.js', 'React', 'Supabase', 'TypeScript', 'Google OAuth', 'Razorpay', 'JavaScript', 'Cloudinary'],
+    redirect: 'https://next-js-commerce-beta.vercel.app/',
   },
   {
     title: 'Podcast Platform',
