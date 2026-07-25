@@ -12,7 +12,7 @@ import CursorWrapper from "@/components/CursorWrapper";
 import Experience from "@/components/Experience";
 
 export const metadata: Metadata = {
-  title: "Kasthuri Rangan | Staff Full Stack Developer Portfolio",
+  title: "Kasthuri Rangan | Full Stack Developer Portfolio",
   description:
     "Professional portfolio of Kasthuri Rangan, a Staff Full Stack Developer specializing in responsive interfaces, RESTful APIs, and modern interactive web architectures.",
   keywords: [

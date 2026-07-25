@@ -117,7 +117,7 @@ export default function Hero() {
             >
               {/* Resume Button - Magnetic Glassmorphic Style */}
               <a
-                href="https://drive.google.com/file/d/16aiBG1fUohpWh1EjDDQHdlw1_f0s8Us7/view"
+                href="https://drive.google.com/file/d/17umHQ9R7W_B6KSvReACB4DP0fcQmEZlZ/view?usp=drive_link"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative flex items-center justify-center gap-2 rounded-lg bg-github-gold px-6 py-3.5 text-sm font-semibold text-github-bg hover:opacity-90 shadow-lg shadow-github-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 w-full sm:w-auto"
