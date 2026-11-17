@@ -239,9 +239,12 @@ export default function Hero() {
             }}
           >
             <div className="relative mx-auto aspect-[3/4] w-[82%] sm:w-[76%] lg:w-[84%]">
+              {/* PHASE 6.16 — a 64px-blur glow behind the portrait is a large
+                  composited surface for a decoration; phones drop it and keep
+                  the seal ring, which carries the same warm halo. */}
               <div
                 aria-hidden="true"
-                className="absolute -inset-8 -z-10 rounded-full bg-gold/[0.06] blur-3xl"
+                className="absolute -inset-8 -z-10 hidden rounded-full bg-gold/[0.06] blur-3xl sm:block"
               />
               <SealRing
                 className="animate-seal absolute left-1/2 top-1/2 -z-10 h-[128%] w-[128%] -translate-x-1/2 -translate-y-1/2 text-gold/25"
@@ -306,7 +309,7 @@ export default function Hero() {
 
             <div className="mt-6 flex items-center justify-center gap-3 font-mono text-[8px] uppercase tracking-[0.28em] text-ash/50 sm:text-[9px]">
               <span aria-hidden="true" className="h-px w-5 bg-bone/20" />
-              Frontend · Full Stack · AI
+              Full Stack · AI · Integrations
               <span aria-hidden="true" className="h-px w-5 bg-bone/20" />
             </div>
           </div>

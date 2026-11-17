@@ -1,4 +1,4 @@
-export type ExperienceType = "full-time" | "internship";
+export type ExperienceType = "full-time" | "internship" | "freelance";
 
 export type ExperienceItem = {
   /** Stable key and anchor fragment (presentation only). */
@@ -11,13 +11,50 @@ export type ExperienceItem = {
   /** Month-precision ISO values for <time dateTime>. Never a specific day. */
   start: string;
   end: string;
+  /** Ongoing chapter: the record renders "Present" instead of the end month. */
+  current?: boolean;
   type: ExperienceType;
   domain: string;
   points: string[];
   stack: string[];
 };
 
+/**
+ * Career ledger.
+ *
+ * Dates are month-precision and come from the résumé record; no day is ever
+ * claimed. The freelance chapter opened after the Simplita engagement closed in
+ * July 2026 and is ongoing, so its `end` is the month this record was last
+ * updated (November 2026) and it renders as "Present". It claims independent
+ * delivery of work that is documented elsewhere in this portfolio — it does not
+ * invent a studio name, a client list or continuous full-time employment.
+ */
 export const experiences: ExperienceItem[] = [
+  {
+    id: "freelance",
+    company: "Freelance",
+    shortName: "Freelance",
+    role: "Freelance Full-Stack Developer",
+    duration: "Jul 2026 — Present",
+    start: "2026-07",
+    end: "2026-11",
+    current: true,
+    type: "freelance",
+    domain: "Independent full-stack and AI integration work",
+    points: [
+      "Independent full-stack delivery between full-time roles — complete applications, third-party integrations and AI-assisted workflows.",
+      "Shipped BugWiser, an AI-assisted GitHub issue investigation tool, and ResQ, a sensor-driven Android safety prototype, as independent builds.",
+      "Kept personal full-stack applications live and maintained: Next.js and Supabase with authentication, payment and media integrations.",
+    ],
+    stack: [
+      "Next.js",
+      "TypeScript",
+      "Supabase",
+      "FastAPI",
+      "LLM integrations",
+      "Git",
+    ],
+  },
   {
     id: "simplita",
     company: "Simplita AI Technologies Private Limited",

@@ -709,29 +709,14 @@ export default function WindReleaseScene({
             {classification} · {discipline}
           </p>
 
+          {/* PHASE 6.16 — one paragraph on the stage; the problem, the
+              implementation and the safety limits are in the record below. */}
           <p className="wnd-intro">
             An Android app for the minutes after a possible crash. It reads the
             phone&rsquo;s motion sensors while the device travels, asks whether
             you are okay when several signals agree, and — only if you do not
             answer — asks your phone to text the contacts you saved.
           </p>
-
-          <dl className="wnd-notes">
-            <div>
-              <dt>The problem</dt>
-              <dd>
-                A person who cannot respond cannot say what happened or where.
-                Minutes pass before anyone notices.
-              </dd>
-            </div>
-            <div>
-              <dt>Who it helps</dt>
-              <dd>
-                People who travel alone, riders and drivers, and anyone who
-                wants a saved contact told when they stop responding.
-              </dd>
-            </div>
-          </dl>
 
           <p className="wnd-disclaimer">
             Hackathon prototype. It demonstrates an alerting workflow; it does

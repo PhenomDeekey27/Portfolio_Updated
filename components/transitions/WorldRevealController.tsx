@@ -64,6 +64,42 @@ const PHASE_DURATION: Record<RevealPhase, number> = {
   COMPLETE: 0,
 };
 
+/** Below this width the Home world is built in DOM/CSS, not WebGL. */
+const COMPACT_QUERY = "(max-width: 1023px)";
+
+/**
+ * PHASE 6.16 — the phone intro script.
+ *
+ * Same story, same phase names, its own pacing. Two things were wrong on a
+ * phone and both were timing, not rendering:
+ *
+ * 1. The loader waited on a WebGL scene that never mounts below 1024px, then
+ *    the visitor waited out the whole desktop-length construction before a
+ *    single readable line appeared — around nine seconds.
+ * 2. The copy only arrived after the world had finished settling, so the text
+ *    and the background never felt like one sequence.
+ *
+ * Here the construction is tighter, the world's final settle (`CAMERA_MOVEMENT`,
+ * a 1700ms CSS push on phones) begins at ~3.1s, and `HERO_TEXT_REVEAL` lands
+ * ~1.2s before that settle finishes. The record therefore reads while the
+ * village is still resolving, then settles without a second wait.
+ *
+ * Desktop keeps `PHASE_DURATION` untouched.
+ */
+const COMPACT_STEPS: { phase: RevealPhase; ms: number }[] = [
+  { phase: "WORLD_REVEAL", ms: 240 },
+  { phase: "MOUNTAIN_CONSTRUCTION", ms: 520 },
+  { phase: "TERRAIN_CONSTRUCTION", ms: 420 },
+  { phase: "BUILDING_CONSTRUCTION", ms: 1250 },
+  { phase: "ENVIRONMENT_ACTIVATION", ms: 700 },
+  { phase: "CAMERA_MOVEMENT", ms: 240 },
+  { phase: "NAVIGATION_REVEAL", ms: 240 },
+  { phase: "HERO_TEXT_REVEAL", ms: 900 },
+  { phase: "PORTRAIT_REVEAL", ms: 400 },
+  { phase: "CTA_REVEAL", ms: 300 },
+  { phase: "COMPLETE", ms: 0 },
+];
+
 export function WorldRevealController({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<RevealPhase>(() =>
     shouldPlayIntro() ? "LOADING" : "COMPLETE"
@@ -83,12 +119,17 @@ export function WorldRevealController({ children }: { children: ReactNode }) {
     setPhase("COMPLETE");
   }, []);
 
-  const runSequence = useCallback(() => {
+  const runSequence = useCallback((compact = false) => {
     if (skippedRef.current) return;
     const rm = reducedMotion;
     const scale = rm ? 0.2 : 1;
 
-    const steps: { phase: RevealPhase; ms: number }[] = [
+    // Reduced motion compresses the compact script by the same factor as the
+    // desktop one — the construction is already replaced by settled frames, so
+    // waiting out the full timeline would be a delay with nothing to watch.
+    const steps: { phase: RevealPhase; ms: number }[] = compact
+      ? COMPACT_STEPS.map((step) => ({ ...step, ms: step.ms * scale }))
+      : [
       { phase: "WORLD_REVEAL", ms: PHASE_DURATION.WORLD_REVEAL * scale },
       { phase: "MOUNTAIN_CONSTRUCTION", ms: PHASE_DURATION.MOUNTAIN_CONSTRUCTION * scale },
       { phase: "TERRAIN_CONSTRUCTION", ms: PHASE_DURATION.TERRAIN_CONSTRUCTION * scale },
@@ -100,7 +141,7 @@ export function WorldRevealController({ children }: { children: ReactNode }) {
       { phase: "PORTRAIT_REVEAL", ms: PHASE_DURATION.PORTRAIT_REVEAL * scale },
       { phase: "CTA_REVEAL", ms: PHASE_DURATION.CTA_REVEAL * scale },
       { phase: "COMPLETE", ms: 0 },
-    ];
+      ];
 
     let acc = 0;
     steps.forEach(({ phase: p, ms }) => {
@@ -125,6 +166,15 @@ export function WorldRevealController({ children }: { children: ReactNode }) {
       runSequence();
     }, minDelay);
   }, [runSequence, reducedMotion]);
+
+  // The phone path has no WebGL scene to wait for: the DOM construction starts
+  // as soon as the controller mounts, so the loader is never a waiting room.
+  useEffect(() => {
+    if (phase !== "LOADING") return;
+    if (!window.matchMedia(COMPACT_QUERY).matches) return;
+    sceneReadyRef.current = true;
+    runSequence(true);
+  }, [phase, runSequence]);
 
   useEffect(() => {
     if (phase !== "LOADING") return;

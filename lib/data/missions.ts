@@ -44,16 +44,16 @@ export const missions: Mission[] = [
   {
     id: "bugwiser",
     name: "BugWiser",
-    category: "Open Source · AI Developer Tooling",
+    category: "Hackathon Project · AI Developer Tooling",
     rank: "S",
     description:
-      "An AI-powered developer debugging assistant that investigates GitHub repositories using actual code evidence to identify potential root causes and suggest fixes.",
+      "An AI developer tool that investigates a GitHub issue against the actual repository, then explains a likely root cause with code evidence and a reviewable patch.",
     highlights: [
-      "GitHub App integration",
-      "Installation-token authentication",
-      "AI provider abstraction",
-      "Model discovery and routing",
-      "Repository-aware debugging",
+      "Repository analysis",
+      "Issue investigation",
+      "Code tracing",
+      "Root-cause analysis and patch preview",
+      "Branch and pull-request workflow",
     ],
     stack: [
       "Next.js",
@@ -66,6 +66,8 @@ export const missions: Mission[] = [
       github: "https://github.com/PhenomDeekey27/BugWiser",
       live: "https://bug-wiser.vercel.app/",
     },
+    note:
+      "Hackathon project associated with Micro1. Open-source developer tool: patches are generated for review, never applied automatically.",
     cover: {
       kind: "screenshot",
       src: "/assets/missions/bugwiser-live.png",
@@ -75,16 +77,16 @@ export const missions: Mission[] = [
   {
     id: "resq",
     name: "ResQ",
-    category: "Hackathon Prototype · Android",
+    category: "Hackathon Project · Android",
     rank: "S",
     description:
-      "A native Android emergency-response application designed to detect potential accidents using device sensors and guide users through an emergency confirmation workflow.",
+      "A native Android safety app that reads the phone's motion sensors, asks the traveller whether they are okay after a possible accident, and escalates to their saved contacts if nobody answers.",
     highlights: [
-      "Kotlin and Jetpack Compose",
-      "Device sensor integration",
-      "Accident detection pipeline",
-      "State-machine architecture",
-      "GPS and foreground-service foundation",
+      "Sensor-based accident detection",
+      "Confirmation and escalation workflow",
+      "Emergency contact SMS and call attempt",
+      "Location fallback",
+      "Nearby emergency resources via SerpApi",
     ],
     stack: ["Kotlin", "Jetpack Compose", "Android Sensors", "FastAPI backend"],
     links: {
@@ -93,7 +95,7 @@ export const missions: Mission[] = [
         "https://github.com/phenomdeekey271020/ResQ-Android/releases/tag/v1.0.1",
     },
     note:
-      "Hackathon prototype. The alerting workflow is demonstrated; it does not dispatch ambulances or replace emergency services.",
+      "Built for the SerpApi India Hackathon 2026. Prototype: it demonstrates an alerting workflow and does not dispatch ambulances or replace emergency services.",
     cover: {
       kind: "illustration",
       variant: "emergency",

@@ -135,7 +135,7 @@ export default function Contact() {
                 index="06"
                 label="Contact"
                 title="Every great mission begins with a message."
-                description="Have a product, a difficult integration or an opportunity in mind? Send a transmission. I'll read it personally."
+                description="Building an application, adding AI to an existing product, or untangling an integration? Send a transmission — I'll read it personally."
               />
             </Reveal>
 

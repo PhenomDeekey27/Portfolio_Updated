@@ -330,29 +330,13 @@ export default function SandDominionScene({
             {classification} · {discipline}
           </p>
 
+          {/* PHASE 6.16 — the stage carries the one-paragraph pitch; the
+              problem/solution detail lives once, in the record below. */}
           <p className="bw-intro">
             An AI debugging assistant for GitHub issues. BugWiser connects a
             repository, traces the code behind a reported bug, and returns an
             evidence-backed root cause with a suggested patch.
           </p>
-
-          <dl className="bw-stage-notes">
-            <div>
-              <dt>The problem</dt>
-              <dd>
-                An issue report rarely points at the code responsible, so the
-                investigation starts from the repository instead of a guess.
-              </dd>
-            </div>
-            <div>
-              <dt>Who it helps</dt>
-              <dd>
-                Developers investigating a reported issue, engineers reading an
-                unfamiliar codebase, and teams reviewing a root cause before a
-                fix.
-              </dd>
-            </div>
-          </dl>
         </div>
 
         <span aria-label={`Mission rank ${mission.rank}`} className="bw-rank">

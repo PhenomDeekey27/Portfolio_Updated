@@ -10785,3 +10785,119 @@ p {
     padding-bottom: 88px;
   }
 }
+
+/* =========================================================================
+   PHASE 6.16 — COMPACT MISSION RECORDS
+
+   BugWiser and ResQ now use the short structure (problem/solution →
+   key implementation → stack/links). Chapters without a screenshot column
+   drop it instead of leaving a 220px hole, and the implementation lists
+   reuse the wind record's type scale.
+   ========================================================================= */
+
+.wnd-chapter--text {
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 2fr);
+}
+
+.wnd-stack-features {
+  display: grid;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.wnd-stack-features > li {
+  border-left: 1px solid rgb(var(--wnd-teal) / 0.22);
+  padding-left: 16px;
+}
+
+.wnd-feature-title {
+  margin-bottom: 4px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--wnd-aqua) / 0.86);
+}
+
+@media (max-width: 1023px) {
+  .wnd-chapter--text {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =========================================================================
+   PHASE 6.16 — PHONE HOME CONSTRUCTION VEIL
+
+   The still plate behind the DOM village is the finished render, so on a phone
+   the construction silhouettes were rising over an already-built village. This
+   single opaque overlay covers the plate for the construction beats and clears
+   when the world's final settle starts. Never rendered on desktop, and it is
+   one composited opacity transition — no filter, no extra layer budget.
+   ========================================================================= */
+
+.leaf-plate-veil {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .leaf-plate-veil {
+    position: absolute;
+    inset: 0;
+    display: block;
+    opacity: 1;
+    transition: opacity 1700ms ease-out;
+    background:
+      radial-gradient(ellipse 96% 66% at 50% 36%, rgb(6 8 11 / 0.52), transparent 72%),
+      linear-gradient(
+        to bottom,
+        rgb(6 8 11 / 0.87) 0%,
+        rgb(6 8 11 / 0.79) 46%,
+        rgb(6 8 11 / 0.72) 100%
+      );
+  }
+
+  [data-world-mode="live"] .leaf-plate-veil {
+    display: none;
+  }
+
+  [data-world-settled="true"] .leaf-plate-veil {
+    opacity: 0;
+  }
+
+  /* The phone script settles faster than the desktop one, so the diorama's
+     push-in is shortened to match (see COMPACT_STEPS). */
+  .lw-diorama {
+    transition-duration: 1700ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf-plate-veil {
+    transition: none;
+  }
+}
+
+/* =========================================================================
+   PHASE 6.16 — MOBILE MOTION BUDGET
+
+   Three perpetual animations were running for the whole life of the page on a
+   phone, and each of them held a permanent compositing layer:
+
+     .animate-seal    120s rotation of the large seal ring behind the portrait
+     .about-drift      70s drift of the full-section valley plate
+     .valley-mist      24s mist drift with an opacity ramp
+
+   At those durations none of them is perceptible on a phone, and all three are
+   replaced by their settled frame. The cinematic sequences (Flying Raijin,
+   Nature Chakra, Rasengan, Sand, Wind, Water, Fire) are untouched — this is a
+   budget cut on ambient drift, not on the main animations.
+   ========================================================================= */
+
+@media (max-width: 1023px) {
+  .animate-seal,
+  .about-drift,
+  .valley-mist {
+    animation: none;
+    will-change: auto;
+  }
+}

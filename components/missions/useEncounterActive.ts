@@ -32,6 +32,30 @@ import { useSectionPhase } from "../ui/SectionContent";
  * only clears the decorative technique state — the description, gallery, links
  * and record stay readable the whole time.
  *
+ * PHASE 6.16 — the arm band is a quarter of the viewport, not a sliver.
+ *
+ * Entering an encounter from *below* is the direction that looked broken: the
+ * old floor was `min(stageHeight * 0.5, viewportHeight * 0.12)`, so the stage
+ * armed while only ~100px of its bottom edge was on screen. The title beat sits
+ * near the top of the stage, so on a phone the technique could burn most of its
+ * 4s timeline before the title was ever visible — the animation replayed, but
+ * the visitor did not see it start. Requiring a quarter of the viewport (capped
+ * by 60% of the stage) means the arm happens when the stage is genuinely being
+ * read, from either direction, and small movements inside the stage still
+ * cannot re-trigger it.
+ *
+ * PHASE 6.16 — the thresholds have to reach the arm band.
+ *
+ * An observer only reports *crossings*, so the old `[0, 0.05, 0.15]` set could
+ * deliver its only intersecting entry while the stage was still under the arm
+ * floor and then stay silent for the rest of the entry. Measured at 320×655:
+ * the sand stage is 453px tall, its first callback reported 116px of overlap
+ * against a 164px floor, and no later callback ever fired — so the technique
+ * never armed, even with the stage filling the screen. The ladder below steps
+ * finely through the low ratios that tall stages reach, so some crossing always
+ * lands above the floor, and the armed ref keeps the extra crossings from
+ * flushing React again.
+ *
  * PHASE 6.15 — the attribute flip is committed synchronously.
  *
  * The replay was reported as still missing when coming back up the page. It was
@@ -48,6 +72,7 @@ export function useEncounterActive<T extends HTMLElement>(options?: {
   rootMargin?: string;
 }) {
   const ref = useRef<T>(null);
+  const armedRef = useRef(false);
   const [inView, setInView] = useState(false);
   const phase = useSectionPhase();
   const rootMargin = options?.rootMargin ?? "0px 0px -6% 0px";
@@ -66,6 +91,8 @@ export function useEncounterActive<T extends HTMLElement>(options?: {
 
         if (!entry.isIntersecting) {
           // Fully out of the band: the next entry replays the technique.
+          if (!armedRef.current) return;
+          armedRef.current = false;
           flushSync(() => setInView(false));
           return;
         }
@@ -77,14 +104,15 @@ export function useEncounterActive<T extends HTMLElement>(options?: {
         const viewportHeight =
           entry.rootBounds?.height ?? window.innerHeight ?? 0;
         const needed = Math.min(
-          entry.boundingClientRect.height * 0.5,
-          viewportHeight * 0.12
+          entry.boundingClientRect.height * 0.6,
+          viewportHeight * 0.25
         );
-        if (entry.intersectionRect.height >= needed) {
+        if (entry.intersectionRect.height >= needed && !armedRef.current) {
+          armedRef.current = true;
           flushSync(() => setInView(true));
         }
       },
-      { threshold: [0, 0.05, 0.15], rootMargin }
+      { threshold: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1], rootMargin }
     );
     observer.observe(el);
     return () => observer.disconnect();

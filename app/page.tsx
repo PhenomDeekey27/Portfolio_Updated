@@ -50,12 +50,17 @@ const personSchema = {
   },
   sameAs: [profile.links.github, profile.links.linkedin],
   knowsAbout: [
-    "Frontend engineering",
+    "Full-stack application development",
     "React",
     "Next.js",
     "TypeScript",
-    "Full-stack development",
-    "AI integrations",
+    "Node.js",
+    "FastAPI",
+    "PostgreSQL",
+    "Supabase",
+    "LLM integrations",
+    "RAG",
+    "Workflow automation",
   ],
 };
 

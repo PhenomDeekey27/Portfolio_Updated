@@ -127,11 +127,13 @@ export default function MobileLeafWorld() {
   const { phase, markSceneReady } = useReveal();
   const [reduced, setReduced] = useState(false);
 
-  // There is no WebGL scene on this path to report readiness, so the layer
-  // reports it — otherwise the intro waits out the controller's 9s fallback and
-  // the phone sits on the loader.
+  // There is no WebGL scene on this path to report readiness. PHASE 6.16: the
+  // controller starts the compact sequence on mount, so this is only a fallback
+  // (desktop-width reduced-motion visitors also land on the DOM world). The
+  // timer is short so the layer is ready long before the first construction
+  // phase needs it.
   useEffect(() => {
-    const timer = window.setTimeout(() => markSceneReady(), 800);
+    const timer = window.setTimeout(() => markSceneReady(), 260);
     return () => window.clearTimeout(timer);
   }, [markSceneReady]);
 
