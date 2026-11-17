@@ -1,157 +1,139 @@
 "use client";
 
-import React from "react";
-import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
-import { Cpu } from "lucide-react";
-import ThreeDCard from "./ThreeDCard";
+import {
+  Code2,
+  Database,
+  LayoutTemplate,
+  Server,
+  Sparkles,
+  Wrench,
+  Target,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import Reveal from "./ui/Reveal";
+import SectionHeading from "./ui/SectionHeading";
+import SkillsWorld from "./worlds/SkillsWorld";
+import SectionContent from "./ui/SectionContent";
+import { useSectionRevealPhase } from "./transitions/TeleportationController";
+import { skillCategories } from "@/lib/data/skills";
+import type { SkillCategory } from "@/lib/data/skills";
 
-// Dynamically import SkillsCanvas with ssr: false
-const SkillsCanvas = dynamic(() => import("./SkillsCanvas"), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[400px] md:h-[500px] w-full flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-12 w-12 rounded-full border-2 border-github-blue border-t-transparent animate-spin" />
-        <span className="text-sm font-mono text-github-subtext">
-          Initializing 3D Orbit...
-        </span>
-      </div>
-    </div>
-  ),
-});
+const categoryIcons: Record<SkillCategory["icon"], LucideIcon> = {
+  code: Code2,
+  layout: LayoutTemplate,
+  server: Server,
+  database: Database,
+  sparkles: Sparkles,
+  wrench: Wrench,
+};
 
-const skillsList = [
-  { name: "Html", img: "/assets/Html.svg", category: "Frontend" },
-  { name: "Css", img: "/assets/CSS3_logo.webp", category: "Frontend" },
-  { name: "JavaScript", img: "/assets/js.webp", category: "Core Language" },
-  { name: "React", img: "/assets/React_logo.png", category: "Library" },
-  { name: "Redux", img: "/assets/redux.webp", category: "State Management" },
-  { name: "MongoDb", img: "/assets/MongoSvg.svg", category: "Database" },
-  { name: "NodeJs", img: "/assets/NodeSvg.svg", category: "Runtime" },
-  {
-    name: "Express",
-    img: "/assets/ExpressSvg.svg",
-    category: "Backend Framework",
-  },
-  { name: "Python", img: "/assets/python.svg", category: "Core Language" },
-  {
-    name: "FastAPI",
-    img: "/assets/fastapi.svg",
-    category: "Backend Framework",
-  },
-  {
-    name: "Supabase",
-    img: "/assets/supabase.svg",
-    category: "Database / Backend",
-  },
-  { name: "PostgreSQL", img: "/assets/postgresql.svg", category: "Database" },
-];
+const motifs: Record<string, string> = {
+  ninjutsu: "Ninjutsu",
+  taijutsu: "Taijutsu",
+  "chakra-control": "Chakra Control",
+  "genjutsu-research": "Genjutsu Research",
+};
 
 export default function Skills() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { type: "spring" as const, stiffness: 100, damping: 15 },
-    },
-  };
+  const phase = useSectionRevealPhase("skills");
 
   return (
     <section
-      id="Skills"
-      className="relative w-full py-24 border-b border-github-border/40 bg-github-surface/30 overflow-hidden"
+      id="skills"
+      className="relative overflow-clip border-b border-bone/10 bg-[#0a120d] py-24 sm:py-32"
     >
-      {/* Background lights */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-github-blue/5 blur-[150px] pointer-events-none" />
+      <SkillsWorld revealed={phase !== "pending"} />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Heading */}
-        <div className="flex flex-col items-center justify-center text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-github-border bg-github-surface text-xs font-mono text-github-blue"
-          >
-            <Cpu className="h-3.5 w-3.5" />
-            Stack Capabilities
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="mt-3 text-3xl sm:text-5xl font-extrabold tracking-tight text-github-gold font-mont"
-          >
-            Technical Skills
-          </motion.h2>
-          <div className="mt-2 h-1 w-20 bg-github-gold rounded-full" />
+      <SectionContent
+        id="skills"
+        className="relative z-10 mx-auto w-full max-w-[1250px] px-5 sm:px-8 lg:px-12"
+      >
+        <div className="relative max-w-2xl">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-x-6 -inset-y-4 bg-[radial-gradient(ellipse_at_20%_40%,rgba(10,18,13,0.72)_0%,rgba(10,18,13,0.45)_55%,transparent_85%)]"
+          />
+          <Reveal>
+            <SectionHeading
+              index="03"
+              label="Skills"
+              title="Shinobi Skill Records"
+              description="A training archive of the tools and disciplines I use to turn problems into shipped interfaces."
+            />
+          </Reveal>
         </div>
 
-        {/* 3D Visualizer & Skills Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Side: 3D Orbit Visualizer (Hidden on mobile/tablet to prevent touch scroll-trapping) */}
-          <div className="hidden lg:flex lg:col-span-6 flex-col justify-center">
-            <div className="text-center lg:text-left mb-6">
-              <h3 className="text-xl font-bold text-github-text font-mono"></h3>
-              <p className="text-sm text-github-subtext mt-1.5"></p>
-            </div>
-            <div className="rounded-2xl border border-github-border bg-github-bg/40 shadow-inner overflow-hidden">
-              <SkillsCanvas />
-            </div>
-          </div>
+        {/* Scroll archive: asymmetric staggered records */}
+        <div className="relative mt-20 space-y-12">
+          {skillCategories.map((category, index) => {
+            const Icon = categoryIcons[category.icon];
+            const alignRight = index % 2 === 1;
+            return (
+              <Reveal key={category.id} delay={index * 140}>
+                <article
+                  className={`group relative max-w-3xl ${
+                    alignRight ? "ml-auto" : "mr-auto"
+                  }`}
+                >
+                  {/* scroll surface */}
+                  <div className="relative overflow-hidden border border-gold/25 bg-[#0d1a12]/78 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-sm sm:p-8">
+                    {/* parchment edge lines */}
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent"
+                    />
 
-          {/* Right Side: Skill Cards Grid */}
-          <div className="col-span-1 lg:col-span-6">
-            <div className="text-center lg:text-left mb-6">
-              <h3 className="text-xl font-bold text-github-text font-mono">
-                Technology Inventory
-              </h3>
-            </div>
-
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-4"
-            >
-              {skillsList.map((skill, index) => (
-                <motion.div key={index} variants={itemVariants}>
-                  <ThreeDCard className="p-4 flex flex-col items-center justify-between text-center h-32 hover:border-github-blue/60 hover:bg-github-surface/80 group cursor-pointer">
-                    <div className="relative h-12 w-12 flex items-center justify-center">
-                      <img
-                        src={skill.img}
-                        alt={skill.name}
-                        className="max-h-full max-w-full object-contain filter group-hover:drop-shadow-[0_0_8px_rgba(88,166,255,0.4)] transition-all duration-300"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="mt-2">
-                      <h4 className="text-xs font-mono font-bold text-github-text truncate">
-                        {skill.name}
-                      </h4>
-                      <span className="text-[9px] font-mono text-github-subtext uppercase tracking-wider block mt-0.5">
-                        {skill.category}
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-gold/35 bg-gold/8 text-gold">
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold/75">
+                          {motifs[category.id]}
+                        </p>
+                        <h3 className="mt-1 font-display text-2xl font-light text-[#f5efe2] sm:text-3xl">
+                          {category.title}
+                        </h3>
+                        <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#c9c2b1]">
+                          {category.subtitle}
+                        </p>
+                      </div>
+                      <span className="ml-auto font-mono text-[9px] tracking-[0.24em] text-gold/45">
+                        {String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
-                  </ThreeDCard>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
+
+                    <div className="mt-5 flex items-center gap-3">
+                      <span className="h-px flex-1 bg-gold/25" />
+                      <Target className="h-3.5 w-3.5 text-gold/55" aria-hidden="true" />
+                      <span className="h-px flex-1 bg-gold/25" />
+                    </div>
+
+                    <ul className="mt-5 grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+                      {category.skills.map((skill) => (
+                        <li
+                          key={skill}
+                          className="flex items-center gap-2 text-sm leading-6 text-[#e8e1d2]"
+                        >
+                          <span
+                            aria-hidden="true"
+                            className="h-1 w-1 shrink-0 rotate-45 bg-gold/70"
+                          />
+                          <span>{skill}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </article>
+              </Reveal>
+            );
+          })}
         </div>
-      </div>
+      </SectionContent>
     </section>
   );
 }

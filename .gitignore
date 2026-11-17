@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local validation captures (referenced by docs/ and scripts/, not published)
+/screenshots/
+
+# scratch audit artifacts from validation runs
+/.tmp-*
+*.log

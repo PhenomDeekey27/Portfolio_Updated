@@ -31,7 +31,7 @@ export default function InteractiveBackground() {
 
     const particles: Particle[] = [];
     // Number of particles depending on screen size
-    const particleCount = Math.min(100, Math.floor((width * height) / 15000));
+    const particleCount = Math.min(40, Math.floor((width * height) / 30000));
 
     // Colors aligned with the system (accent blue, accent purple, accent gold)
     const colors = [
@@ -84,6 +84,11 @@ export default function InteractiveBackground() {
     mouseRef.current.y = height / 2;
 
     const draw = () => {
+      if (document.visibilityState === 'hidden') {
+        animationId = window.setTimeout(draw, 500) as unknown as number;
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       // Smooth mouse interpolation
@@ -152,8 +157,8 @@ export default function InteractiveBackground() {
         ctx.fillStyle = colors[colorIndex] + p.alpha + ')';
         ctx.fill();
 
-        // Draw connections between nearby particles
-        for (let j = i + 1; j < particles.length; j++) {
+        // Draw connections between nearby particles (limited to a few neighbours)
+        for (let j = i + 1; j < Math.min(particles.length, i + 9); j++) {
           const p2 = particles[j];
           const dx2 = (p.x + ox) - (p2.x + (p2.x - mouse.x < maxDist ? (p2.x - mouse.x)/Math.hypot(p2.x - mouse.x, p2.y - mouse.y)*(maxDist - Math.hypot(p2.x - mouse.x, p2.y - mouse.y))/maxDist * 15 * (250/p2.z) : 0));
           const dy2 = (p.y + oy) - (p2.y + (p2.y - mouse.y < maxDist ? (p2.y - mouse.y)/Math.hypot(p2.x - mouse.x, p2.y - mouse.y)*(maxDist - Math.hypot(p2.x - mouse.x, p2.y - mouse.y))/maxDist * 15 * (250/p2.z) : 0));

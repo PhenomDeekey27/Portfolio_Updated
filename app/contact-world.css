@@ -1,0 +1,393 @@
+/* =========================================================================
+   PHASE 6.12 — HOKAGE COMMUNICATION CHAMBER (Contact environment)
+
+   The chamber is an inline vector scene (components/worlds/ContactWorld.tsx)
+   behind a sticky 100lvh band, matching the framing model used by About,
+   Skills, Missions and Experience. This block only owns the framing, the
+   atmospheric grade and the dust layer — the room itself is in the SVG, so
+   nothing here duplicates another section's plate.
+   ========================================================================= */
+
+.ctc-world {
+  background-color: #080604;
+}
+
+/* The room holds still while the transmission form scrolls over it. */
+.ctc-band {
+  position: sticky;
+  top: 0;
+  height: 100lvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ctc-scene {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Left falloff: the heading and the communication records are read here. */
+.ctc-grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      100deg,
+      rgba(6, 5, 4, 0.7) 0%,
+      rgba(6, 5, 4, 0.48) 20%,
+      rgba(6, 5, 4, 0.2) 38%,
+      rgba(6, 5, 4, 0.06) 54%,
+      rgba(6, 5, 4, 0.16) 74%,
+      rgba(6, 5, 4, 0.4) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(6, 5, 4, 0.62) 0%,
+      rgba(6, 5, 4, 0.2) 14%,
+      rgba(6, 5, 4, 0.04) 36%,
+      rgba(6, 5, 4, 0.16) 72%,
+      rgba(6, 5, 4, 0.52) 100%
+    );
+}
+
+/* Warm lantern light pooling from both sides of the room. */
+.ctc-lantern-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 8% 26%,
+      rgba(255, 203, 128, 0.16) 0%,
+      rgba(255, 190, 110, 0.05) 36%,
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse at 92% 22%,
+      rgba(255, 203, 128, 0.12) 0%,
+      rgba(255, 190, 110, 0.04) 34%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 58% 44%,
+      rgba(255, 214, 150, 0.08) 0%,
+      transparent 58%
+    );
+}
+
+.ctc-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 54% 46%,
+    transparent 0%,
+    rgba(4, 4, 3, 0.16) 74%,
+    rgba(4, 4, 3, 0.46) 100%
+  );
+}
+
+.ctc-dust {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ctc-dust span {
+  position: absolute;
+  border-radius: 999px;
+  background: #ffdca8;
+}
+
+/* Phones: the window sits centre-frame and the copy is stacked over it, so the
+   grade closes down further at the top and bottom rather than the sides. */
+@media (max-width: 639px) {
+  /* Slice framing keeps the village window centre-frame on a phone: the
+     visible span of the 1600×900 scene is its middle band, which holds the
+     pane, the sill and the left lantern. The lantern-side glows sit outside
+     that band, so the phone grade leans on the window light instead. */
+  .ctc-lantern-glow {
+    background: radial-gradient(
+      ellipse at 50% 30%,
+      rgba(255, 203, 128, 0.12) 0%,
+      rgba(255, 190, 110, 0.04) 42%,
+      transparent 68%
+    );
+  }
+
+  .ctc-grade {
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(6, 5, 4, 0.86) 0%,
+        rgba(6, 5, 4, 0.64) 26%,
+        rgba(6, 5, 4, 0.5) 52%,
+        rgba(6, 5, 4, 0.66) 78%,
+        rgba(6, 5, 4, 0.84) 100%
+      ),
+      linear-gradient(100deg, rgba(6, 5, 4, 0.5), rgba(6, 5, 4, 0.18) 60%, rgba(6, 5, 4, 0.46));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctc-dust {
+    display: none;
+  }
+}
+/* -------------------------------------------------------------------------
+   The parchment transmission scroll (Contact form)
+
+   A scroll, not a card: two wooden rollers, a deckled parchment sheet with
+   ruled fields and gold rules, and a leaf seal. Ink/chakra response on focus
+   is a gold underline bloom — no blur filters, no per-frame React state.
+   ------------------------------------------------------------------------- */
+
+.tx-scroll {
+  position: relative;
+  padding-block: 20px;
+}
+
+.tx-roller {
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  height: 15px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #6a5533 0%, #3f3020 52%, #241a10 100%);
+  box-shadow:
+    0 3px 12px rgba(12, 8, 4, 0.5),
+    inset 0 1px 0 rgba(255, 233, 184, 0.3);
+}
+
+.tx-roller-top {
+  top: 0;
+}
+
+.tx-roller-bottom {
+  bottom: 0;
+}
+
+.tx-roller::before,
+.tx-roller::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ffe6ae 0%, #c9a35f 46%, #7c6134 100%);
+  box-shadow: 0 1px 5px rgba(12, 8, 4, 0.55);
+}
+
+.tx-roller::before {
+  left: -6px;
+}
+
+.tx-roller::after {
+  right: -6px;
+}
+
+.tx-sheet {
+  position: relative;
+  padding: clamp(20px, 3vw, 38px) clamp(18px, 3.4vw, 40px);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(43, 34, 18, 0.055) 0 1px,
+      transparent 1px 32px
+    ),
+    linear-gradient(172deg, #f2e7cd 0%, #e7d8b6 56%, #d9c69c 100%);
+  border-inline: 1px solid rgba(122, 90, 42, 0.35);
+  box-shadow:
+    inset 0 0 60px rgba(96, 72, 38, 0.16),
+    inset 0 1px 0 rgba(255, 246, 224, 0.6),
+    0 22px 54px rgba(10, 7, 3, 0.45);
+}
+
+/* Deckled edge: a soft torn-paper feather at the top and bottom of the sheet. */
+.tx-sheet::before,
+.tx-sheet::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 10px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(43, 34, 18, 0.22),
+    rgba(43, 34, 18, 0)
+  );
+}
+
+.tx-sheet::before {
+  top: 0;
+}
+
+.tx-sheet::after {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(43, 34, 18, 0.22), rgba(43, 34, 18, 0));
+}
+
+/* The small leaf seal at the head of the transmission. */
+.tx-leaf {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  padding: 7px;
+  color: #7a5a2a;
+  border: 1px solid rgba(122, 90, 42, 0.45);
+  transform: rotate(-6deg);
+  background: rgba(255, 246, 224, 0.35);
+}
+
+/* Fields read as ruled lines on a mission document. */
+.tx-field {
+  display: block;
+  width: 100%;
+  padding: 7px 0 9px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #241b12;
+  caret-color: #8a6b3c;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed rgba(107, 86, 54, 0.55);
+  border-radius: 0;
+  transition:
+    border-color 180ms ease,
+    box-shadow 220ms ease;
+}
+
+.tx-field::placeholder {
+  color: rgba(58, 43, 28, 0.42);
+}
+
+/* Ink response: the rule turns solid gold and a warm bloom settles under it. */
+.tx-field:hover {
+  border-bottom-color: rgba(107, 86, 54, 0.8);
+}
+
+.tx-field:focus {
+  outline: none;
+  border-bottom-color: #8a6b3c;
+  box-shadow:
+    0 1px 0 0 #8a6b3c,
+    0 10px 18px -12px rgba(122, 90, 42, 0.85);
+}
+
+.tx-field:focus-visible {
+  outline: 2px solid rgba(138, 107, 60, 0.6);
+  outline-offset: 4px;
+}
+
+.tx-field-area {
+  min-height: 168px;
+  resize: vertical;
+  line-height: 1.75;
+}
+
+/* The send action is the sealed transmission itself. */
+.tx-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
+  padding: 14px 22px;
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f4ecdb;
+  background: #241b12;
+  border: 1px solid rgba(201, 163, 95, 0.5);
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+
+.tx-send:hover:not(:disabled),
+.tx-send:focus-visible:not(:disabled) {
+  background: #33271a;
+  border-color: rgba(201, 163, 95, 0.85);
+}
+
+.tx-send:focus-visible {
+  outline: 2px solid rgba(201, 163, 95, 0.75);
+  outline-offset: 3px;
+}
+
+.tx-send:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.tx-send-mark {
+  width: 20px;
+  height: 20px;
+  color: #d8b878;
+  transform: rotate(-6deg);
+}
+
+/* A restrained seal pulse on hover/focus — opacity only. */
+@media (prefers-reduced-motion: no-preference) {
+  .tx-send:hover .tx-send-mark,
+  .tx-send:focus-visible .tx-send-mark {
+    animation: tx-seal-pulse 1600ms ease-in-out infinite;
+  }
+}
+
+@keyframes tx-seal-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Wax seal shown once the transmission is really sealed. */
+.tx-stamp {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  padding: 11px;
+  color: #7a2c20;
+  border: 1px solid rgba(122, 44, 32, 0.45);
+  border-radius: 50%;
+  transform: rotate(-8deg);
+  background: rgba(122, 44, 32, 0.07);
+}
+
+@media (max-width: 639px) {
+  .tx-scroll {
+    padding-block: 16px;
+  }
+
+  /* 16px keeps iOS from zooming a focused field. */
+  .tx-field {
+    font-size: 16px;
+  }
+
+  .tx-field-area {
+    min-height: 150px;
+  }
+
+  .tx-send {
+    width: 100%;
+    padding-block: 15px;
+  }
+}

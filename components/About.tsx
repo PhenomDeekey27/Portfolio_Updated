@@ -1,144 +1,101 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { User, Code2, Cpu, Sparkles } from 'lucide-react';
+import { Code2, Layers3, Sparkles } from "lucide-react";
+import { profile } from "@/lib/data/profile";
+import AboutWorld from "./worlds/AboutWorld";
+import { useSectionRevealPhase } from "./transitions/TeleportationController";
+import Reveal from "./ui/Reveal";
+import SectionContent from "./ui/SectionContent";
+
+const disciplines = [
+  { icon: Code2, title: "Frontend engineering", copy: "React and Next.js interfaces with typed component systems, accessible interactions and an obsession with the details that make a product feel considered." },
+  { icon: Layers3, title: "Full-stack delivery", copy: "REST APIs, backend services and data models built with Node.js, Express, FastAPI, PostgreSQL, Supabase and MongoDB." },
+  { icon: Sparkles, title: "AI and integrations", copy: "LLM pipelines, retrieval, MCP tools, CRM syncs, messaging workflows and voice agents connected into products people actually use." },
+];
+
+const VALLEY_GOLD = "border-gold/20 bg-[#07111F]/35 text-gold-soft";
+
+const STAGGER = { indicator: 0, heading: 160, intro: 340, journey: 560, frontend: 780, fullstack: 960, ai: 1140, principle: 1320 };
 
 export default function About() {
-  const cardVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: 'spring' as const, stiffness: 80, damping: 15 },
-    },
-  };
+  const phase = useSectionRevealPhase("about");
+  const worldVisible = phase !== "pending";
+  const textVisible = phase === "content";
 
   return (
-    <section
-      id="About"
-      className="relative w-full py-24 border-b border-github-border/40 bg-github-bg"
-    >
-      {/* Background radial highlight */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_500px_at_50%_50%,rgba(188,140,255,0.03),transparent)] pointer-events-none" />
+    <section id="about" data-about-section className="relative overflow-clip border-b border-bone/10 bg-[#070809] pt-[48svh] pb-24 sm:pt-[58svh] sm:pb-32 lg:pt-[62svh]">
+      <AboutWorld revealed={worldVisible} />
 
-      <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Heading */}
-        <div className="flex flex-col items-center justify-center text-center mb-16">
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-github-border bg-github-surface text-xs font-mono text-github-purple"
-          >
-            <User className="h-3.5 w-3.5" />
-            Who I Am
-          </motion.div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="mt-3 text-3xl sm:text-5xl font-extrabold tracking-tight text-github-gold font-mont"
-          >
-            About Me
-          </motion.h2>
-          <div className="mt-2 h-1 w-20 bg-github-gold rounded-full" />
-        </div>
+      <SectionContent
+        id="about"
+        className="relative z-10 mx-auto w-full max-w-[1250px] px-5 sm:px-8 lg:px-12"
+      >
+        <div
+          aria-hidden="true"
+          data-about-scrim
+          className="pointer-events-none absolute left-1/2 -top-[18svh] -bottom-24 -z-10 w-screen -translate-x-1/2 bg-[linear-gradient(to_bottom,rgba(5,6,8,0)_0%,rgba(5,6,8,0.3)_9%,rgba(5,6,8,0.55)_24%,rgba(5,6,8,0.7)_52%,rgba(5,6,8,0.78)_100%)]"
+          style={{ opacity: textVisible ? 1 : 0, transition: "opacity 700ms ease" }}
+        />
 
-        {/* Content Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch">
-          
-          {/* Main About Card (GitHub-Readme styled file block) */}
-          <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
-            className="md:col-span-8 rounded-xl border border-github-border bg-github-surface shadow-2xl overflow-hidden flex flex-col justify-between"
-          >
-            {/* Readme Title Bar */}
-            <div className="flex items-center justify-between border-b border-github-border bg-github-card px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Code2 className="h-4 w-4 text-github-blue" />
-                <span className="font-mono text-xs text-github-text font-medium">README.md</span>
+        <Reveal delay={STAGGER.indicator}>
+          <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.32em] text-gold-soft sm:text-[11px]">
+            <span>02</span>
+            <span aria-hidden="true" className="h-px w-10 bg-gold-soft/40" />
+            <span>About</span>
+          </div>
+        </Reveal>
+        <Reveal delay={STAGGER.heading}>
+          <h2 className="mt-5 max-w-3xl font-display text-4xl leading-[1.05] font-light tracking-tight text-[#f5efe2] sm:text-5xl lg:text-6xl [text-shadow:0_2px_28px_rgba(0,0,0,0.9)]">
+            A developer shaped by curiosity, shipped work and the space between design and engineering.
+          </h2>
+        </Reveal>
+        <Reveal delay={STAGGER.intro}>
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-[#ddd4c1] sm:text-base [text-shadow:0_1px_18px_rgba(0,0,0,0.85)]">
+            I care about the whole path from an idea to a reliable interface: how it looks, how it behaves, how it scales and how it feels to the person on the other side of the screen.
+          </p>
+        </Reveal>
+
+        <div className="mt-14 grid grid-cols-1 gap-10 lg:mt-16 lg:grid-cols-12 lg:gap-12">
+          <Reveal className="lg:col-span-7" delay={STAGGER.journey}>
+            <div className="border-l-2 border-gold/35 pl-6 sm:pl-7">
+              <div className="space-y-6 text-[15px] leading-8 text-[#d6cfbe] [text-shadow:0_1px_14px_rgba(0,0,0,0.75)] sm:text-base">
+                <p>I&apos;m a frontend-focused full stack developer with two years of experience building web applications across product teams and client platforms. My strongest ground is React and Next.js, supported by TypeScript, thoughtful component architecture and a practical understanding of what happens beyond the interface.</p>
+                <p>My work has moved from MERN product features to enterprise no-code tooling, FastAPI services, CRM integrations and AI-powered automation. I enjoy the connective tissue of a product: the API contract, the edge case, the workflow that quietly saves someone an hour.</p>
+                <p>Recently, I&apos;ve been building with LLMs, retrieval and MCP tools, and integrating email, WhatsApp, Telegram and voice-agent channels into real business workflows. I care about honest systems, clear interfaces and code that is easier to change than it was to write.</p>
               </div>
-              <div className="flex gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-github-border" />
-                <span className="h-3 w-3 rounded-full bg-github-border" />
-                <span className="h-3 w-3 rounded-full bg-github-border" />
+              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-gold/15 pt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#b8b1a1]">
+                <span className="text-gold-soft">Based in</span><span>{profile.location}</span>
+                <span aria-hidden="true" className="h-3 w-px bg-gold-soft/20" />
+                <span className="text-gold-soft">Experience</span><span>2+ years</span>
               </div>
             </div>
+          </Reveal>
 
-            {/* Readme Content */}
-            <div className="p-6 sm:p-8 font-sans space-y-6 text-github-text leading-relaxed">
-              <p className="text-lg font-medium text-github-text/95 border-l-2 border-github-gold pl-4 italic">
-                &ldquo;Full Stack Developer with 2+ years of experience building scalable web applications using the MERN stack and AI-powered automation solutions.&rdquo;
-              </p>
-              
-              <div className="h-[1px] bg-github-border" />
-
-              <p className="text-base text-github-subtext">
-                I specialize in developing end-to-end features, from designing RESTful APIs and backend microservices (FastAPI, Express) to building responsive, modern user interfaces with React, Next.js, and TypeScript.
-              </p>
-              <p className="text-base text-github-subtext">
-                My hands-on experience includes engineering workflow automation (Zoho CRM, Meta APIs), real-time notification reminder systems (WhatsApp, Telegram, Email), and secure database configurations (MongoDB, PostgreSQL, Supabase).
-              </p>
+          <div className="lg:col-span-5">
+            <div className="space-y-4">
+              {disciplines.map((d, idx) => {
+                const Icon = d.icon;
+                const delay = idx === 0 ? STAGGER.frontend : idx === 1 ? STAGGER.fullstack : STAGGER.ai;
+                return (
+                  <Reveal key={d.title} delay={delay}>
+                    <div className="group flex gap-4 border-b border-gold/15 py-4 transition-colors duration-300 hover:border-gold-soft/40">
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${VALLEY_GOLD} backdrop-blur-sm transition-colors duration-300 group-hover:bg-gold-soft/10`}><Icon className="h-4 w-4" aria-hidden="true" /></div>
+                      <div>
+                        <h3 className="text-sm font-semibold tracking-wide text-[#f5efe2] [text-shadow:0_1px_12px_rgba(0,0,0,0.8)]">{d.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-[#c9c2b1] [text-shadow:0_1px_12px_rgba(0,0,0,0.75)]">{d.copy}</p>
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
             </div>
-
-            {/* Readme Footer bar */}
-            <div className="border-t border-github-border bg-github-card px-6 py-4 flex items-center justify-between text-xs font-mono text-github-subtext">
-              <span>Lines: 12  ·  UTF-8</span>
-              <span>TypeScript / React</span>
-            </div>
-          </motion.div>
-
-          {/* Quick Metrics & Focus Cards */}
-          <div className="md:col-span-4 flex flex-col gap-6 justify-between">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="rounded-xl border border-github-border bg-github-surface p-6 shadow-md flex-1 flex flex-col justify-center"
-            >
-              <div className="flex items-center gap-3 mb-3 text-github-gold">
-                <Sparkles className="h-5 w-5" />
-                <h3 className="font-semibold text-github-text text-sm uppercase tracking-wider font-mono">My Philosophy</h3>
-              </div>
-              <p className="text-xs text-github-subtext leading-relaxed">
-                Design with intent, build for scale, write readable code, and ensure 100% responsiveness on every screen.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="rounded-xl border border-github-border bg-github-surface p-6 shadow-md flex-1 flex flex-col justify-center"
-            >
-              <div className="flex items-center gap-3 mb-3 text-github-blue">
-                <Cpu className="h-5 w-5" />
-                <h3 className="font-semibold text-github-text text-sm uppercase tracking-wider font-mono">Core Focus</h3>
-              </div>
-              <ul className="text-xs text-github-subtext space-y-2 font-mono">
-                <li className="flex items-center gap-1.5">
-                  <span className="text-github-green">✓</span> Full Stack Architectures
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="text-github-blue">✓</span> Responsive UI Engineering
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="text-github-purple">✓</span> API Integrations & Webhooks
-                </li>
-              </ul>
-            </motion.div>
+            <Reveal className="mt-8" delay={STAGGER.principle}>
+              <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold-soft/80">Working principle · 04</p>
+              <p className="mt-3 max-w-md font-display text-2xl font-light italic leading-snug text-[#f5efe2] [text-shadow:0_1px_18px_rgba(0,0,0,0.85)] sm:text-3xl">&ldquo;Design with intent. Build for scale. Leave the code clearer than you found it.&rdquo;</p>
+            </Reveal>
           </div>
         </div>
-
-      </div>
+      </SectionContent>
     </section>
   );
 }

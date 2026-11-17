@@ -1,183 +1,324 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
-import { Download, FileText, ArrowRight } from "lucide-react";
-
-// Dynamically import Three.js Canvas to skip SSR issues
-const HeroCanvas = dynamic(() => import("./HeroCanvas"), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 bg-github-bg/20 animate-pulse" />
-  ),
-});
+import { ArrowDownRight, ArrowRight, FileText } from "lucide-react";
+import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
+import KunaiMark from "./motifs/KunaiMark";
+import SealRing from "./motifs/SealRing";
+import SectionLink from "./ui/SectionLink";
+import HiddenLeafStage from "./worlds/HiddenLeafStage";
+import { useReveal } from "@/components/transitions/WorldRevealController";
+import { profile } from "@/lib/data/profile";
 
 export default function Hero() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: "spring" as const, stiffness: 100, damping: 15 },
-    },
-  };
-
-  const handleScrollToProjects = () => {
-    const el = document.getElementById("Portfolio");
-    if (el) {
-      const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = el.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-    }
-  };
+  const { phase } = useReveal();
+  const contentVisible =
+    phase === "HERO_TEXT_REVEAL" ||
+    phase === "PORTRAIT_REVEAL" ||
+    phase === "CTA_REVEAL" ||
+    phase === "COMPLETE";
+  const metadataVisible = contentVisible;
+  const portraitVisible =
+    phase === "PORTRAIT_REVEAL" ||
+    phase === "CTA_REVEAL" ||
+    phase === "COMPLETE";
+  const ctaVisible = phase === "CTA_REVEAL" || phase === "COMPLETE";
 
   return (
     <section
-      id="hero"
-      className="relative flex min-h-[90vh] md:min-h-screen w-full items-center justify-center overflow-hidden pt-20 md:pt-0 border-b border-github-border/40"
+      id="home"
+      className="relative isolate overflow-hidden border-b border-bone/10 pt-32 pb-16 sm:pt-36 lg:min-h-svh lg:pt-40 lg:pb-24"
     >
-      {/* 3D WebGL Particle ring background */}
-      <HeroCanvas />
+      {/* Layered atmosphere */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(ellipse_at_72%_30%,#121a26_0%,#0b0e13_42%,#070809_72%)]"
+      />
 
-      {/* Grid overlay to give developer IDE vibes */}
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#161b22_1px,transparent_1px),linear-gradient(to_bottom,#161b22_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
+      <HiddenLeafStage />
 
-      {/* Decorative colored glow spheres */}
-      <div className="absolute -top-[10%] -left-[10%] h-[500px] w-[500px] rounded-full bg-github-blue/10 blur-[120px] pointer-events-none glow-animate" />
-      <div className="absolute -bottom-[10%] -right-[10%] h-[500px] w-[500px] rounded-full bg-github-purple/10 blur-[120px] pointer-events-none glow-animate" />
+      {/* Contrast scrims keep the hero copy legible over the village */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(7,8,9,0.92)_0%,rgba(7,8,9,0.84)_28%,rgba(7,8,9,0.48)_54%,rgba(7,8,9,0.12)_78%,rgba(7,8,9,0.22)_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_16%_62%,rgba(7,8,9,0.62),transparent_58%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,rgba(7,8,9,0.58)_0%,transparent_30%,transparent_62%,rgba(7,8,9,0.92)_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.045] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]"
+      >
+        <div className="h-full w-full bg-[linear-gradient(to_right,rgba(237,231,218,0.16)_1px,transparent_1px),linear-gradient(to_bottom,rgba(237,231,218,0.12)_1px,transparent_1px)] bg-[size:12.5%_100%,100%_9rem]" />
+      </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
-          {/* Left Text Column */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="md:col-span-7 text-center md:text-left flex flex-col justify-center"
-          >
-            <motion.div
-              variants={itemVariants}
-              className="inline-flex items-center gap-2 self-center md:self-start mb-4 px-3 py-1 rounded-full border border-github-border bg-github-surface/80 text-xs font-mono text-github-blue"
+      <div
+        className={`mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12 transition-all duration-1000 ease-out ${
+          contentVisible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-6 pointer-events-none"
+        }`}
+      >
+        <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-7">
+            <div
+              className="hero-rise flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[9px] uppercase tracking-[0.3em] text-ash/70 sm:text-[10px] transition-all duration-700 ease-out"
+              style={{
+                opacity: metadataVisible ? 1 : 0,
+                transform: metadataVisible ? "translateY(0)" : "translateY(-0.6rem)",
+                transitionDelay: "100ms",
+              }}
             >
-              <span className="flex h-2 w-2 rounded-full bg-github-green animate-pulse" />
-              Available for new opportunities
-            </motion.div>
-
-            <motion.h3
-              variants={itemVariants}
-              className="text-lg font-mono text-github-subtext tracking-wider"
-            >
-              Hi, I&apos;m
-            </motion.h3>
-
-            <motion.h1
-              variants={itemVariants}
-              className="mt-1 text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight"
-            >
-              <span className="bg-gradient-to-r from-github-text via-github-subtext to-github-border bg-clip-text text-transparent">
-                Kasthuri Rangan
+              <span className="inline-flex items-center gap-2 text-gold-soft">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold" />
+                </span>
+                {profile.availability}
               </span>
-            </motion.h1>
+              <span aria-hidden="true" className="h-px w-6 bg-bone/20" />
+              <span>Portfolio · 2026</span>
+            </div>
 
-            <motion.h2
-              variants={itemVariants}
-              className="mt-3 text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-github-gold italic"
-            >
-              MERN STACK & AI DEVELOPER
-            </motion.h2>
+            <p className="hero-rise hero-rise-1 mt-8 font-mono text-[10px] uppercase tracking-[0.38em] text-ash/60 sm:text-[11px]">
+              Hidden Leaf · Developer Record
+            </p>
 
-            <motion.p
-              variants={itemVariants}
-              className="mt-6 max-w-xl text-base sm:text-lg text-github-subtext"
-            >
-              Full Stack Developer with 2+ years of experience building scalable
-              web applications using the MERN stack and AI-powered automation
-              solutions.
-            </motion.p>
+            <h1 className="hero-rise hero-rise-2 mt-5 font-display font-light uppercase leading-[0.8] tracking-[-0.02em] text-bone">
+              <span className="block text-[clamp(3.5rem,11vw,8.75rem)]">
+                {"Kasthuri".split("").map((ch, i) => (
+                  <span
+                    key={i}
+                    className="inline-block transition-all duration-700 ease-out"
+                    style={{
+                      opacity: contentVisible ? 1 : 0,
+                      transform: contentVisible
+                        ? "translateY(0)"
+                        : "translateY(1.2rem)",
+                      transitionDelay: `${i * 35}ms`,
+                    }}
+                  >
+                    {ch}
+                  </span>
+                ))}
+              </span>
+              <span className="mt-1 block text-[clamp(3.5rem,11vw,8.75rem)] italic text-gold-soft">
+                {"Rangan".split("").map((ch, i) => (
+                  <span
+                    key={i}
+                    className="inline-block transition-all duration-700 ease-out"
+                    style={{
+                      opacity: contentVisible ? 1 : 0,
+                      transform: contentVisible
+                        ? "translateY(0)"
+                        : "translateY(1.2rem)",
+                      transitionDelay: `${(i + 8) * 35}ms`,
+                    }}
+                  >
+                    {ch}
+                  </span>
+                ))}
+              </span>
+            </h1>
 
-            <motion.div
-              variants={itemVariants}
-              className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center"
+            <div
+              className="hero-rise hero-rise-3 mt-7 flex items-center gap-4 transition-all duration-700 ease-out"
+              style={{
+                opacity: contentVisible ? 1 : 0,
+                transform: contentVisible ? "translateY(0)" : "translateY(0.8rem)",
+                transitionDelay: "700ms",
+              }}
             >
-              {/* Resume Button - Magnetic Glassmorphic Style */}
+              <span aria-hidden="true" className="h-px w-12 bg-gold/60" />
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/90 sm:text-xs sm:tracking-[0.26em]">
+                {profile.role.split(" ").map((word, i) => (
+                  <span
+                    key={i}
+                    className="inline-block mr-2 transition-all duration-500 ease-out"
+                    style={{
+                      opacity: contentVisible ? 1 : 0,
+                      transform: contentVisible
+                        ? "translateY(0)"
+                        : "translateY(0.6rem)",
+                      transitionDelay: `${1000 + i * 120}ms`,
+                    }}
+                  >
+                    {word}
+                  </span>
+                ))}
+              </p>
+            </div>
+
+            <p
+              className="hero-rise hero-rise-4 mt-7 max-w-xl text-base leading-8 text-ash sm:text-lg transition-all duration-700 ease-out"
+              style={{
+                opacity: contentVisible ? 1 : 0,
+                transform: contentVisible ? "translateY(0)" : "translateY(0.8rem)",
+                transitionDelay: "1000ms",
+              }}
+            >
+              {profile.intro}
+            </p>
+
+            <div
+              className="hero-rise hero-rise-5 mt-9 flex flex-col gap-3 sm:flex-row sm:items-center transition-all duration-700 ease-out"
+              style={{
+                opacity: ctaVisible ? 1 : 0,
+                transform: ctaVisible ? "translateY(0)" : "translateY(0.8rem)",
+                transitionDelay: "200ms",
+                pointerEvents: ctaVisible ? "auto" : "none",
+              }}
+            >
+              <SectionLink
+                sectionId="missions"
+                className="group inline-flex items-center justify-center gap-3 bg-gold px-6 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-void transition-colors duration-300 hover:bg-gold-soft"
+              >
+                View My Missions
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </SectionLink>
+              <SectionLink
+                sectionId="contact"
+                className="group inline-flex items-center justify-center gap-3 border border-bone/20 px-6 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-bone transition-colors duration-300 hover:border-gold/70 hover:text-gold-soft"
+              >
+                Contact Me
+                <ArrowDownRight
+                  className="h-4 w-4 text-ash transition-transform duration-300 group-hover:translate-x-0.5 group-hover:translate-y-0.5"
+                  aria-hidden="true"
+                />
+              </SectionLink>
+            </div>
+
+            <div className="hero-rise hero-rise-6 mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 border-t border-bone/10 pt-6">
               <a
-                href="https://drive.google.com/file/d/17umHQ9R7W_B6KSvReACB4DP0fcQmEZlZ/view?usp=drive_link"
+                href={profile.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex items-center justify-center gap-2 rounded-lg bg-github-gold px-6 py-3.5 text-sm font-semibold text-github-bg hover:opacity-90 shadow-lg shadow-github-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 w-full sm:w-auto"
+                className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ash transition-colors hover:text-bone"
               >
-                <FileText className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
-                My Resume
+                <FaGithub className="h-4 w-4 text-ash/70 transition-colors group-hover:text-gold" />
+                GitHub
               </a>
-
-              {/* Action Project Scroll Button */}
-              <button
-                onClick={handleScrollToProjects}
-                className="group flex items-center justify-center gap-2 rounded-lg border border-github-border bg-github-surface/50 hover:bg-github-card px-6 py-3.5 text-sm font-semibold text-github-text transition-all duration-200 w-full sm:w-auto cursor-pointer"
+              <a
+                href={profile.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ash transition-colors hover:text-bone"
               >
-                Explore Projects
-                <ArrowRight className="h-4 w-4 text-github-subtext group-hover:translate-x-1 group-hover:text-github-blue transition-all" />
-              </button>
-            </motion.div>
-          </motion.div>
+                <FaLinkedinIn className="h-4 w-4 text-ash/70 transition-colors group-hover:text-gold" />
+                LinkedIn
+              </a>
+              <a
+                href={profile.resumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ash transition-colors hover:text-bone"
+              >
+                <FileText className="h-4 w-4 text-ash/70 transition-colors group-hover:text-gold" />
+                Résumé
+              </a>
+            </div>
+          </div>
 
-          {/* Right Profile Image Column */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 80,
-              damping: 15,
-              delay: 0.4,
+          {/* Editorial portrait composition */}
+          <div
+            className="hero-rise hero-rise-4 relative mx-auto w-full max-w-[22rem] sm:max-w-[26rem] lg:col-span-5 lg:max-w-none transition-all duration-1000 ease-out"
+            style={{
+              opacity: portraitVisible ? 1 : 0,
+              transform: portraitVisible ? "translateY(0)" : "translateY(1.5rem)",
+              clipPath: portraitVisible
+                ? "inset(0 0 0% 0)"
+                : "inset(0 0 100% 0)",
             }}
-            className="md:col-span-5 flex items-center justify-center mt-6 md:mt-0"
           >
-            <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 group">
-              {/* Outer floating ambient rings */}
-              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-github-blue via-github-purple to-github-gold opacity-30 blur-lg group-hover:opacity-60 transition-opacity duration-500 animate-pulse" />
-              <div className="absolute inset-0 rounded-2xl border border-github-border bg-github-card p-2 shadow-2xl">
-                <div className="relative w-full h-full rounded-xl overflow-hidden bg-github-bg">
-                  <Image
-                    src="/assets/Profile.png"
-                    alt="Kasthuri Rangan Profile Image"
-                    fill
-                    sizes="(max-w-768px) 256px, 384px"
-                    priority
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Subtle terminal-like code layout grid cover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-github-bg via-transparent to-transparent opacity-60" />
+            <div className="relative mx-auto aspect-[3/4] w-[82%] sm:w-[76%] lg:w-[84%]">
+              <div
+                aria-hidden="true"
+                className="absolute -inset-8 -z-10 rounded-full bg-gold/[0.06] blur-3xl"
+              />
+              <SealRing
+                className="animate-seal absolute left-1/2 top-1/2 -z-10 h-[128%] w-[128%] -translate-x-1/2 -translate-y-1/2 text-gold/25"
+                strokeWidth={0.8}
+              />
+
+              <div className="absolute -left-4 top-10 hidden h-[62%] w-px bg-gradient-to-b from-transparent via-gold/50 to-transparent sm:block" />
+              <div className="absolute -right-4 bottom-10 hidden h-[42%] w-px bg-gradient-to-b from-transparent via-bone/25 to-transparent sm:block" />
+
+              <div className="group absolute inset-0 overflow-hidden border border-bone/15 bg-graphite">
+                <Image
+                  src="/assets/Profile.png"
+                  alt="Portrait of Kasthuri Rangan"
+                  fill
+                  loading="eager"
+                  sizes="440px"
+                  className="object-cover object-[center_22%] grayscale-[30%] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-void via-void/10 to-transparent"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gold/[0.07] mix-blend-overlay"
+                />
+
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
+                  <div>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-gold">
+                      Record no. 04
+                    </p>
+                    <p className="mt-1 font-display text-xl font-light italic text-bone">
+                      The will of fire
+                    </p>
+                  </div>
+                  <KunaiMark className="h-7 w-7 -rotate-12 text-gold/80" />
                 </div>
               </div>
 
-              {/* Aesthetic Tech Tag Indicator overlays */}
-              <div className="hidden sm:block absolute -bottom-4 -left-4 rounded-lg border border-github-border bg-github-surface/90 backdrop-blur-md px-3 py-1.5 font-mono text-xs text-github-subtext shadow-md">
-                <span className="text-github-blue">&lt;</span>coder
-                <span className="text-github-blue">/&gt;</span>
-              </div>
-              <div className="hidden sm:block absolute -top-4 -right-4 rounded-lg border border-github-border bg-github-surface/90 backdrop-blur-md px-3 py-1.5 font-mono text-xs text-github-subtext shadow-md">
-                <span className="text-github-purple">const</span> dev ={" "}
-                <span className="text-github-gold">true</span>;
+              <span
+                aria-hidden="true"
+                className="absolute -left-2 -top-2 h-8 w-8 border-l border-t border-gold/60"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute -bottom-2 -right-2 h-8 w-8 border-b border-r border-gold/60"
+              />
+
+              <div
+                aria-hidden="true"
+                className="absolute -right-7 top-1/2 hidden -translate-y-1/2 [writing-mode:vertical-rl] lg:block"
+              >
+                <span className="font-jp text-[11px] tracking-[0.5em] text-ash/50">
+                  飛雷神
+                </span>
+                <span className="mt-3 font-jp text-[9px] tracking-[0.4em] text-gold/60">
+                  四代目
+                </span>
               </div>
             </div>
-          </motion.div>
+
+            <div className="mt-6 flex items-center justify-center gap-3 font-mono text-[8px] uppercase tracking-[0.28em] text-ash/50 sm:text-[9px]">
+              <span aria-hidden="true" className="h-px w-5 bg-bone/20" />
+              Frontend · Full Stack · AI
+              <span aria-hidden="true" className="h-px w-5 bg-bone/20" />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-16 hidden items-center justify-between border-t border-bone/10 pt-5 font-mono text-[9px] uppercase tracking-[0.28em] text-ash/45 lg:flex">
+          <span>Scroll to explore</span>
+          <span className="flex items-center gap-2">
+            <KunaiMark className="h-3.5 w-3.5 rotate-180 text-gold/60" />
+            Flying Raijin
+          </span>
+          <span>{profile.location}</span>
         </div>
       </div>
     </section>

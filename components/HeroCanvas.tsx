@@ -4,6 +4,17 @@ import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+function createSeededRandom(seed: number) {
+  let state = seed;
+
+  return () => {
+    state += 0x6d2b79f5;
+    let value = Math.imul(state ^ (state >>> 15), 1 | state);
+    value ^= value + Math.imul(value ^ (value >>> 7), 61 | value);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function Particles() {
   const pointsRef = useRef<THREE.Points | null>(null);
   
@@ -11,6 +22,7 @@ function Particles() {
   const [positions, colors] = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const cols = new Float32Array(count * 3);
+    const random = createSeededRandom(0x9e3779b9);
     
     const themeColors = [
       new THREE.Color('#58A6FF'), // Blue
@@ -20,18 +32,18 @@ function Particles() {
     
     for (let i = 0; i < count; i++) {
       // Golden spiral distribution to form a sleek toroidal cloud
-      const u = Math.random();
-      const v = Math.random();
+      const u = random();
+      const v = random();
       const theta = u * 2.0 * Math.PI;
       const phi = Math.acos(2.0 * v - 1.0);
       
-      const r = Math.random() * 1.5 + 1.2; // radius between 1.2 and 2.7
+      const r = random() * 1.5 + 1.2; // radius between 1.2 and 2.7
       
       pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.7; // slightly squashed
       pos[i * 3 + 2] = r * Math.cos(phi);
       
-      const color = themeColors[Math.floor(Math.random() * themeColors.length)];
+      const color = themeColors[Math.floor(random() * themeColors.length)];
       cols[i * 3] = color.r;
       cols[i * 3 + 1] = color.g;
       cols[i * 3 + 2] = color.b;

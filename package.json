@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "validate:worlds": "node scripts/validate-world-environments.mjs",
+    "prebuild": "node scripts/validate-world-environments.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -12,7 +14,6 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "framer-motion": "^12.40.0",
-    "gsap": "^3.15.0",
     "lenis": "^1.3.23",
     "lucide-react": "^1.20.0",
     "next": "16.2.9",

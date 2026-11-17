@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useMemo } from 'react';
+import Image from 'next/image';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -70,9 +71,12 @@ function OrbitGroup() {
           <Html distanceFactor={7} center>
             <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-github-surface/90 border border-github-border hover:border-github-blue hover:shadow-[0_0_15px_rgba(88,166,255,0.2)] text-center backdrop-blur-xs select-none hover:scale-110 active:scale-95 transition-all duration-300 w-24 h-24 cursor-grab active:cursor-grabbing">
               <div className="relative w-10 h-10 mb-2 flex items-center justify-center">
-                <img
+                <Image
                   src={skill.img}
                   alt={skill.name}
+                  width={40}
+                  height={40}
+                  unoptimized
                   className="w-full h-full object-contain pointer-events-none"
                   loading="lazy"
                 />

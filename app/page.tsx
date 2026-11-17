@@ -1,47 +1,34 @@
-import React from "react";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import LenisScroll from "@/components/LenisScroll";
-import InteractiveBackground from "@/components/InteractiveBackground";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
-import Projects from "@/components/Projects";
-import Contact from "@/components/ContactUs";
-import CursorWrapper from "@/components/CursorWrapper";
+import Missions from "@/components/Missions";
 import Experience from "@/components/Experience";
+import Contact from "@/components/ContactUs";
+import Footer from "@/components/Footer";
+import { WorldRevealController } from "@/components/transitions/WorldRevealController";
+import { TeleportationController } from "@/components/transitions/TeleportationController";
+import { profile, siteMetadata } from "@/lib/data/profile";
 
 export const metadata: Metadata = {
-  title: "Kasthuri Rangan | Full Stack Developer Portfolio",
-  description:
-    "Professional portfolio of Kasthuri Rangan, a Staff Full Stack Developer specializing in responsive interfaces, RESTful APIs, and modern interactive web architectures.",
-  keywords: [
-    "Kasthuri Rangan",
-    "Full Stack Developer",
-    "React",
-    "Next.js",
-    "TypeScript",
-    "Three.js",
-    "Developer Portfolio",
-    "Web3Forms",
-    "Tailwind CSS",
-  ],
-  authors: [{ name: "Kasthuri Rangan" }],
-  creator: "Kasthuri Rangan",
+  title: siteMetadata.title,
+  description: siteMetadata.description,
+  keywords: [...siteMetadata.keywords],
+  authors: [{ name: profile.name }],
+  creator: profile.name,
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://github.com/PhenomDeekey27",
-    title: "Kasthuri Rangan | Staff Full Stack Developer Portfolio",
-    description:
-      "Professional portfolio of Kasthuri Rangan, a Staff Full Stack Developer specializing in responsive interfaces, RESTful APIs, and modern interactive web architectures.",
-    siteName: "Kasthuri Rangan Portfolio",
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    siteName: `${profile.name} Portfolio`,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kasthuri Rangan | Staff Full Stack Developer Portfolio",
-    description:
-      "Professional portfolio of Kasthuri Rangan, a Staff Full Stack Developer specializing in responsive interfaces, RESTful APIs, and modern interactive web architectures.",
+    title: siteMetadata.title,
+    description: siteMetadata.description,
   },
   robots: {
     index: true,
@@ -49,41 +36,60 @@ export const metadata: Metadata = {
   },
 };
 
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: profile.name,
+  jobTitle: profile.role,
+  email: `mailto:${profile.email}`,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Villupuram",
+    addressRegion: "Tamil Nadu",
+    addressCountry: "IN",
+  },
+  sameAs: [profile.links.github, profile.links.linkedin],
+  knowsAbout: [
+    "Frontend engineering",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "Full-stack development",
+    "AI integrations",
+  ],
+};
+
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen bg-github-bg text-github-text font-sans antialiased selection:bg-github-blue/30 selection:text-github-text">
-      {/* Dynamic Splash Cursor fluid simulation */}
-      <CursorWrapper />
+    <WorldRevealController>
+      <TeleportationController>
+      <div className="relative min-h-screen overflow-x-clip bg-void text-bone">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
 
-      {/* Lenis Smooth Scroll Engine */}
-      <LenisScroll />
+        <div className="grain" aria-hidden="true" />
 
-      {/* Global Interactive 3D Canvas Background */}
-      <InteractiveBackground />
+        <LenisScroll />
+        <Navbar />
 
-      {/* Sticky Glassmorphic Header */}
-      <Navbar />
+        <main id="main-content">
+          <Hero />
+          <About />
+          <Skills />
+          <Missions />
+          <Experience />
+          <Contact />
+        </main>
 
-      {/* Main Page Layout Wrapper */}
-      <main className="relative z-10 flex flex-col w-full">
-        {/* World-Class Hero Section with 3D ring visualizer */}
-        <Hero />
+        <Footer />
 
-        {/* Git-Readme Styled About Me Panel */}
-        <About />
-
-        {/* Career Experience Timeline */}
-        <Experience />
-
-        {/* 3D Skills Sphere and Technology Inventory */}
-        <Skills />
-
-        {/* 3D Spotlight Tilt Cards Projects Board */}
-        <Projects />
-
-        {/* Premium Contact Form and Social Connect Link Footer */}
-        <Contact />
-      </main>
-    </div>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
+      </div>
+      </TeleportationController>
+    </WorldRevealController>
   );
 }

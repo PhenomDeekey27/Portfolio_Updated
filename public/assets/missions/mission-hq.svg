@@ -1,0 +1,363 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1200" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A traditional Hidden Leaf mission briefing room at night: a low wooden table with a Land of Fire map, scrolls and sealed documents, shoji screens opening onto a misty forest, and a warm paper lantern">
+  <defs>
+    <linearGradient id="room" x1="0" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#0a0c09"/>
+      <stop offset="0.5" stop-color="#080a07"/>
+      <stop offset="1" stop-color="#050605"/>
+    </linearGradient>
+    <linearGradient id="plaster" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0" stop-color="#0b0d0a"/>
+      <stop offset="0.65" stop-color="#0d100c"/>
+      <stop offset="1" stop-color="#090b08"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b1c12"/>
+      <stop offset="0.5" stop-color="#1a110b"/>
+      <stop offset="1" stop-color="#0f0a07"/>
+    </linearGradient>
+    <linearGradient id="beamSide" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0d0906"/>
+      <stop offset="0.55" stop-color="#24170f"/>
+      <stop offset="1" stop-color="#130d08"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16100a"/>
+      <stop offset="0.55" stop-color="#100b07"/>
+      <stop offset="1" stop-color="#080604"/>
+    </linearGradient>
+    <linearGradient id="tableTop" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#3b2718"/>
+      <stop offset="0.45" stop-color="#291b11"/>
+      <stop offset="1" stop-color="#160e08"/>
+    </linearGradient>
+    <linearGradient id="tableEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c120b"/>
+      <stop offset="1" stop-color="#0a0705"/>
+    </linearGradient>
+    <linearGradient id="forestSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#07110e"/>
+      <stop offset="0.5" stop-color="#0b1a15"/>
+      <stop offset="0.78" stop-color="#12251c"/>
+      <stop offset="1" stop-color="#0c1712"/>
+    </linearGradient>
+    <linearGradient id="forestHaze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c927f" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#7c927f" stop-opacity="0.11"/>
+      <stop offset="1" stop-color="#7c927f" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d3bb8c"/>
+      <stop offset="0.55" stop-color="#b39a6e"/>
+      <stop offset="1" stop-color="#8a7350"/>
+    </linearGradient>
+    <linearGradient id="paperShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0c99a"/>
+      <stop offset="0.7" stop-color="#b9a073"/>
+      <stop offset="1" stop-color="#8e7752"/>
+    </linearGradient>
+    <linearGradient id="shojiPaper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c7b183" stop-opacity="0.2"/>
+      <stop offset="0.5" stop-color="#9e8a63" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#6c5c41" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="lanternPaper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4d7a0"/>
+      <stop offset="0.45" stop-color="#eabf79"/>
+      <stop offset="1" stop-color="#c28c48"/>
+    </linearGradient>
+    <radialGradient id="lanternGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f6ce8d" stop-opacity="0.5"/>
+      <stop offset="0.35" stop-color="#e2a95e" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#c98a3c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lightPool" cx="0.5" cy="0.45" r="0.5">
+      <stop offset="0" stop-color="#eab878" stop-opacity="0.2"/>
+      <stop offset="0.42" stop-color="#c98f4c" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#a16b31" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lightBeam" cx="0.5" cy="0.25" r="0.62">
+      <stop offset="0" stop-color="#f0c184" stop-opacity="0.14"/>
+      <stop offset="0.5" stop-color="#d59a54" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#b87c36" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="banner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a2b21"/>
+      <stop offset="0.5" stop-color="#122019"/>
+      <stop offset="1" stop-color="#0b1510"/>
+    </linearGradient>
+    <radialGradient id="warmTable" cx="0.58" cy="0.35" r="0.6">
+      <stop offset="0" stop-color="#d59e57" stop-opacity="0.18"/>
+      <stop offset="0.5" stop-color="#a16b31" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#a16b31" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sealRed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8e2f27"/>
+      <stop offset="1" stop-color="#5f1d18"/>
+    </linearGradient>
+    <linearGradient id="kunaiMetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8d8c84"/>
+      <stop offset="0.5" stop-color="#4d4d47"/>
+      <stop offset="1" stop-color="#262623"/>
+    </linearGradient>
+  </defs>
+
+  <!-- room shell -->
+  <rect width="1920" height="1200" fill="url(#room)"/>
+
+  <!-- interior plaster wall -->
+  <rect x="0" y="80" width="980" height="790" fill="url(#plaster)"/>
+  <g opacity="0.5">
+    <path d="M0 300h980M0 560h980M0 760h980" stroke="#050604" stroke-width="3"/>
+    <path d="M60 80v790M210 80v790M470 80v790M820 80v790M930 80v790" stroke="#141a13" stroke-width="2" opacity="0.6"/>
+  </g>
+
+  <!-- far shoji panels on the left wall (very dim, behind text) -->
+  <g opacity="0.32">
+    <rect x="80" y="310" width="330" height="420" fill="url(#shojiPaper)" stroke="#1a140d" stroke-width="4"/>
+    <path d="M80 415h330M80 520h330M80 625h330M162 310v420M244 310v420M326 310v420" stroke="#1a140d" stroke-width="3"/>
+  </g>
+
+  <!-- ceiling and beams -->
+  <rect x="0" y="0" width="1920" height="88" fill="#060705"/>
+  <rect x="0" y="48" width="1920" height="34" fill="url(#beam)"/>
+  <rect x="0" y="82" width="1920" height="12" fill="#050604"/>
+  <path d="M0 48h1920" stroke="#3a2718" stroke-opacity="0.45" stroke-width="1.5"/>
+
+  <!-- veranda opening: night forest -->
+  <g>
+    <rect x="980" y="94" width="940" height="758" fill="url(#forestSky)"/>
+
+    <!-- distant moon haze -->
+    <rect x="980" y="94" width="940" height="360" fill="url(#forestHaze)" opacity="0.5"/>
+
+    <!-- far mountains -->
+    <path d="M980 596l90-52 74 34 86-46 92 40 84-58 96 42 78-30 92 48 94-58 84 36 70-22v126H980Z" fill="#0b1712" opacity="0.9"/>
+    <path d="M980 640l104-34 88 22 96-30 100 26 88-40 100 28 96-20 94 32 94-38 80 24v104H980Z" fill="#0d1d16" opacity="0.95"/>
+
+    <!-- distant village rooftops and warm windows -->
+    <g fill="#08120e" opacity="0.98">
+      <path d="M1120 714l58-34 58 34v42h-116z"/>
+      <path d="M1250 722l52-30 52 30v36h-104z"/>
+      <path d="M1380 706l64-38 64 38v48h-128z"/>
+      <path d="M1530 724l46-28 46 28v34h-92z"/>
+    </g>
+    <g fill="#e8b46b" opacity="0.5">
+      <rect x="1146" y="722" width="5" height="7"/>
+      <rect x="1170" y="730" width="4" height="5"/>
+      <rect x="1300" y="732" width="5" height="6"/>
+      <rect x="1410" y="720" width="5" height="7"/>
+      <rect x="1436" y="734" width="4" height="5"/>
+    </g>
+
+    <!-- mist bands -->
+    <rect x="980" y="556" width="940" height="92" fill="url(#forestHaze)"/>
+    <rect x="980" y="672" width="940" height="120" fill="url(#forestHaze)" opacity="0.8"/>
+
+    <!-- distant cedar band -->
+    <g fill="#0a1711" opacity="0.8">
+      <path d="M990 760V452c0-8 5-14 12-14s12 6 12 14v308Z"/>
+      <path d="M1014 470c-44 4-76 16-104 30 34 6 74 6 104 0 30 6 70 6 104 0-28-14-60-26-104-30Z"/>
+      <path d="M1014 522c-50 4-86 16-118 30 38 6 84 6 118 0 34 6 80 6 118 0-32-14-68-26-118-30Z"/>
+      <path d="M1580 760V480c0-9 5-16 13-16s13 7 13 16v280Z"/>
+      <path d="M1593 498c-42 4-72 16-98 30 32 6 70 6 98 0 28 6 66 6 98 0-26-14-56-26-98-30Z"/>
+      <path d="M1593 548c-48 4-82 16-112 30 36 6 80 6 112 0 32 6 76 6 112 0-30-14-64-26-112-30Z"/>
+    </g>
+
+    <!-- near cedar silhouettes -->
+    <g fill="#07110d">
+      <path d="M1052 802V486c0-10 6-18 14-18s14 8 14 18v316Z"/>
+      <path d="M1066 506c-62 6-108 24-146 44 46 8 104 8 146-2 42 10 100 10 146 2-38-20-84-38-146-44Z"/>
+      <path d="M1066 570c-70 6-120 24-162 44 50 8 116 8 162-2 46 10 112 10 162 2-42-20-92-38-162-44Z"/>
+      <path d="M1066 638c-78 6-132 24-178 44 56 8 128 8 178-2 50 10 122 10 178 2-46-20-100-38-178-44Z"/>
+      <path d="M1066 710c-86 6-146 24-196 44 60 8 140 8 196-2 56 10 136 10 196 2-50-20-110-38-196-44Z"/>
+    </g>
+
+    <!-- near cedar silhouette, right edge -->
+    <g fill="#06100c">
+      <path d="M1652 802V430c0-11 7-20 16-20s16 9 16 20v372Z"/>
+      <path d="M1668 452c-70 6-122 26-166 48 52 8 118 8 166-2 48 10 114 10 166 2-44-22-96-42-166-48Z"/>
+      <path d="M1668 522c-80 6-138 26-186 48 58 8 134 8 186-2 52 10 128 10 186 2-48-22-106-42-186-48Z"/>
+      <path d="M1668 596c-90 6-154 26-206 48 64 8 148 8 206-2 58 10 142 10 206 2-52-22-116-42-206-48Z"/>
+      <path d="M1668 674c-100 6-170 26-226 48 70 8 162 8 226-2 64 10 156 10 226 2-56-22-126-42-226-48Z"/>
+    </g>
+
+    <!-- drifting ground mist -->
+    <path d="M980 756c150-30 250 18 380 2s260-34 380 0 160 10 180 4v50H980Z" fill="#9db39d" opacity="0.05"/>
+  </g>
+
+  <!-- veranda timber frame -->
+  <rect x="940" y="86" width="52" height="780" fill="url(#beamSide)"/>
+  <rect x="940" y="86" width="8" height="780" fill="#4a311d" opacity="0.28"/>
+  <rect x="980" y="116" width="940" height="34" fill="url(#beam)"/>
+  <rect x="980" y="116" width="940" height="5" fill="#4a311d" opacity="0.35"/>
+  <rect x="1860" y="86" width="60" height="780" fill="url(#beamSide)"/>
+  <path d="M980 150h940" stroke="#050604" stroke-width="4" opacity="0.7"/>
+
+  <!-- ranma transom: vertical slats above the veranda opening -->
+  <g opacity="0.85">
+    <rect x="990" y="152" width="870" height="86" fill="#080a07" opacity="0.55"/>
+    <g stroke="#1e150d" stroke-width="5">
+      <path d="M1010 152v86M1046 152v86M1082 152v86M1118 152v86M1154 152v86M1190 152v86M1226 152v86M1262 152v86M1298 152v86M1334 152v86M1370 152v86M1406 152v86M1442 152v86M1478 152v86M1514 152v86M1550 152v86M1586 152v86M1622 152v86M1658 152v86M1694 152v86M1730 152v86M1766 152v86M1802 152v86M1838 152v86"/>
+    </g>
+    <path d="M990 238h870" stroke="#1e150d" stroke-width="7"/>
+  </g>
+
+  <!-- engawa railing at the veranda edge -->
+  <g>
+    <rect x="990" y="792" width="870" height="13" fill="#2b1c12"/>
+    <rect x="990" y="792" width="870" height="4" fill="#4a311d" opacity="0.35"/>
+    <g stroke="#24170f" stroke-width="7">
+      <path d="M1020 805v34M1110 805v34M1200 805v34M1290 805v34M1380 805v34M1470 805v34M1560 805v34M1650 805v34M1740 805v34M1830 805v34"/>
+    </g>
+    <rect x="990" y="834" width="870" height="11" fill="#1b110b"/>
+  </g>
+
+  <!-- carved leaf plaque on the left pillar -->
+  <g>
+    <rect x="946" y="300" width="40" height="128" fill="#1d130c" stroke="#3a2617" stroke-width="2"/>
+    <g transform="translate(955 330) scale(1.15)" fill="none" stroke="#d8b573" stroke-opacity="0.55" stroke-width="1.6" stroke-linecap="round">
+      <path d="M1 16C-11 13-18 3-15-7c3-10 13-15 22-11 6 3 9 9 7 15-1 5-6 8-11 6-4-1-5-5-3-8 1-2 4-3 6-1"/>
+      <path d="M17 3c5 9 3 18-4 24"/>
+    </g>
+  </g>
+
+  <!-- partially closed shoji screen on the far right of the opening -->
+  <g opacity="0.9">
+    <rect x="1700" y="150" width="160" height="650" fill="#0d1210" stroke="#1d150e" stroke-width="6"/>
+    <rect x="1712" y="162" width="136" height="626" fill="url(#shojiPaper)"/>
+    <path d="M1712 318h136M1712 474h136M1712 630h136M1758 162v626M1804 162v626" stroke="#23190f" stroke-width="4"/>
+  </g>
+
+  <!-- hanging leaf crest banner on the right pillar -->
+  <g>
+    <rect x="1756" y="230" width="12" height="44" fill="#24170f"/>
+    <path d="M1704 268h116v330l-58 26-58-26Z" fill="url(#banner)" stroke="#2d2115" stroke-width="2"/>
+    <path d="M1704 286h116M1704 560h116" stroke="#c9a35f" stroke-opacity="0.22" stroke-width="2"/>
+    <g transform="translate(1732 366) scale(2.3)" fill="none" stroke="#d8b573" stroke-opacity="0.5" stroke-width="1.5" stroke-linecap="round">
+      <path d="M1 16C-11 13-18 3-15-7c3-10 13-15 22-11 6 3 9 9 7 15-1 5-6 8-11 6-4-1-5-5-3-8 1-2 4-3 6-1"/>
+      <path d="M17 3c5 9 3 18-4 24"/>
+    </g>
+  </g>
+
+  <!-- floor -->
+  <rect x="0" y="852" width="1920" height="348" fill="url(#floor)"/>
+  <g stroke="#241810" stroke-opacity="0.55" stroke-width="2">
+    <path d="M0 884h1920M0 938h1920M0 1000h1920M0 1074h1920M0 1160h1920"/>
+    <path d="M180 852l-80 348M480 852l-30 348M780 852l30 348M1080 852l90 348M1400 852l140 348M1740 852l190 348"/>
+  </g>
+
+  <!-- second shoji panel and interior post on the left wall -->
+  <g opacity="0.2">
+    <rect x="470" y="330" width="330" height="400" fill="url(#shojiPaper)" stroke="#1a140d" stroke-width="4"/>
+    <path d="M470 430h330M470 530h330M470 630h330M552 330v400M634 330v400M716 330v400" stroke="#1a140d" stroke-width="3"/>
+  </g>
+  <rect x="432" y="94" width="26" height="758" fill="url(#beamSide)" opacity="0.85"/>
+  <rect x="436" y="94" width="4" height="758" fill="#4a311d" opacity="0.2"/>
+
+  <!-- warm light pool under the lantern -->
+  <ellipse cx="1330" cy="960" rx="700" ry="340" fill="url(#lightPool)"/>
+
+  <!-- lantern -->
+  <g>
+    <path d="M1458 86v104" stroke="#1b120b" stroke-width="5"/>
+    <rect x="1418" y="188" width="80" height="18" fill="#2a1c11" stroke="#0d0906" stroke-width="2"/>
+    <path d="M1430 206h56l18 118h-92Z" fill="url(#lanternPaper)" stroke="#3a2717" stroke-width="2"/>
+    <path d="M1438 224h40M1435 248h46M1432 272h52M1429 296h58" stroke="#8a5f2e" stroke-opacity="0.4" stroke-width="1.5"/>
+    <path d="M1487 324h-58l-14 16h86Z" fill="#2a1c11"/>
+    <ellipse cx="1478" cy="256" rx="210" ry="200" fill="url(#lanternGlow)"/>
+  </g>
+
+  <!-- low wooden briefing table -->
+  <path d="M588 900 1540 842 1890 1028 890 1132Z" fill="url(#tableTop)"/>
+  <path d="M588 900 1540 842 1890 1028 890 1132Z" fill="url(#warmTable)"/>
+  <path d="M890 1132 1890 1028v58L890 1198Z" fill="url(#tableEdge)"/>
+  <path d="M588 900 1540 842 1890 1028" fill="none" stroke="#5a3b22" stroke-opacity="0.55" stroke-width="3"/>
+  <path d="M890 1132 1890 1028" fill="none" stroke="#4a301b" stroke-opacity="0.6" stroke-width="2"/>
+  <g stroke="#1a1009" stroke-opacity="0.55" stroke-width="1.5" fill="none">
+    <path d="M690 944c220-34 480-52 720-44M760 988c250-30 520-32 760 6M860 1042c210-16 430-10 640 26"/>
+    <path d="M980 900c40 70 60 140 44 216M1280 878c20 78 24 152 6 226M1600 866c-6 74-20 142-46 208"/>
+  </g>
+  <g transform="translate(1790 1092) rotate(-6)" fill="none" stroke="#c9a35f" stroke-opacity="0.3" stroke-width="1.4" stroke-linecap="round">
+    <path d="M0 10C-8 8-12 2-10-5c2-6 8-9 14-7 4 2 6 6 4 9-1 3-4 5-7 4-2-1-3-3-2-5"/>
+    <path d="M11 2c3 6 2 11-3 15"/>
+  </g>
+
+  <!-- Land of Fire map -->
+  <g transform="translate(880 928) rotate(-3)">
+    <path d="M0 26 466-18 560 158 96 212Z" fill="url(#paper)" stroke="#6f5a3b" stroke-width="1.5"/>
+    <path d="M0 26 466-18 560 158 96 212Z" fill="#0b0d09" opacity="0.06"/>
+    <path d="M14 40c86-18 140-2 206 6s132-8 196-28 104-20 128-8" fill="none" stroke="#6b5a3d" stroke-opacity="0.5" stroke-width="2.5"/>
+    <path d="M22 74c82-14 128 6 186 20s142 8 212-12 96-18 122-6" fill="none" stroke="#6b5a3d" stroke-opacity="0.38" stroke-width="2"/>
+    <g fill="none" stroke="#6a5133" stroke-opacity="0.48" stroke-width="2">
+      <path d="M92 116l26-22 26 22M150 108l20-18 20 18M410 60l24-20 24 20"/>
+      <path d="M210 150c22-30 44-30 66 0s44 30 66 0"/>
+      <path d="M320 172c26-26 50-26 76 0"/>
+    </g>
+    <g stroke="#7b5f3c" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="5 7" fill="none">
+      <path d="M60 60c90 8 150 34 214 62s132 30 210 16"/>
+    </g>
+    <g fill="url(#sealRed)" opacity="0.85">
+      <rect x="410" y="24" width="22" height="22" transform="rotate(8 421 35)"/>
+      <rect x="72" y="156" width="18" height="18" transform="rotate(-8 81 165)"/>
+    </g>
+    <path d="M436 84c10-4 18 2 18 12s-8 16-18 12" fill="none" stroke="#7b5f3c" stroke-opacity="0.5" stroke-width="2"/>
+    <g transform="translate(468 150) rotate(-4)" fill="none" stroke="#c9a35f" stroke-opacity="0.4" stroke-width="1.2" stroke-linecap="round">
+      <path d="M0 8C-6 6-9 1-8-4c2-5 7-7 11-5 3 1 4 4 3 6-1 2-3 3-5 2"/>
+      <path d="M7 2c3 4 2 8-2 11"/>
+    </g>
+  </g>
+
+  <!-- rolled scrolls -->
+  <g>
+    <path d="M690 1028l168-22c10-1 18 6 18 16s-7 18-17 19l-168 20c-10 1-18-6-18-16s7-17 17-17Z" fill="url(#paperShade)" stroke="#7a6443" stroke-width="1.2"/>
+    <ellipse cx="691" cy="1043" rx="13" ry="19" fill="#b49b70" stroke="#7a6443"/>
+    <path d="M760 1018l4 36M744 1020l4 36" stroke="#3b2c1b" stroke-width="3"/>
+    <path d="M746 1038l18-2" stroke="#8e2f27" stroke-width="4"/>
+  </g>
+  <g>
+    <path d="M1370 1002l152-24c9-1 16 5 17 14s-6 17-15 18l-152 22c-9 1-16-5-17-14s6-15 15-16Z" fill="url(#paperShade)" stroke="#7a6443" stroke-width="1.2"/>
+    <ellipse cx="1534" cy="1000" rx="11" ry="17" fill="#b49b70" stroke="#7a6443"/>
+    <path d="M1444 1002l2 30M1428 1004l2 30" stroke="#3b2c1b" stroke-width="3"/>
+    <path d="M1430 1019l16-2" stroke="#8e2f27" stroke-width="4"/>
+  </g>
+
+  <!-- sealed documents -->
+  <g transform="translate(1620 1084) rotate(-8)">
+    <rect x="-84" y="-42" width="176" height="116" rx="2" fill="url(#paperShade)" stroke="#6f5a3b"/>
+    <rect x="-76" y="-50" width="170" height="108" rx="2" fill="url(#paper)" stroke="#6f5a3b"/>
+    <path d="M-56-24h112M-56-8h126M-56 8h96M-56 24h118" stroke="#6b5a3d" stroke-opacity="0.4" stroke-width="2"/>
+    <circle cx="42" cy="38" r="13" fill="url(#sealRed)"/>
+    <path d="M34 36c4-4 10-4 14 0M36 42c3 3 7 3 10 0" fill="none" stroke="#3d100d" stroke-width="1.4" opacity="0.7"/>
+    <path d="M-70 26c-18 4-26 16-22 30" fill="none" stroke="#8e2f27" stroke-width="3"/>
+  </g>
+
+  <!-- kunai on the table edge -->
+  <g transform="translate(760 1112) rotate(-18)">
+    <path d="M-46 0 16-7l14 7-14 7-62-7Z" fill="url(#kunaiMetal)"/>
+    <path d="M-46 0 16-7l14 7" fill="none" stroke="#a5a39a" stroke-opacity="0.35"/>
+    <path d="M-62 0h16" stroke="#2c2418" stroke-width="7"/>
+    <circle cx="-66" cy="0" r="7" fill="none" stroke="#3b3122" stroke-width="4"/>
+  </g>
+
+  <!-- ink stone and brush -->
+  <g transform="translate(1180 1082) rotate(6)">
+    <rect x="0" y="0" width="66" height="30" rx="4" fill="#0b0c0a" stroke="#26221a"/>
+    <ellipse cx="33" cy="15" rx="21" ry="7" fill="#040504"/>
+    <path d="M54 18 150-12" stroke="#3b2b1b" stroke-width="5" stroke-linecap="round"/>
+    <path d="M150-12 172-19l-6 12Z" fill="#12100c"/>
+  </g>
+
+  <!-- dust motes in the lantern light -->
+  <g fill="#f0d29a">
+    <circle cx="1240" cy="420" r="2" opacity="0.28"/>
+    <circle cx="1322" cy="500" r="1.6" opacity="0.22"/>
+    <circle cx="1410" cy="392" r="1.4" opacity="0.26"/>
+    <circle cx="1504" cy="470" r="2.2" opacity="0.2"/>
+    <circle cx="1580" cy="608" r="1.5" opacity="0.18"/>
+    <circle cx="1186" cy="646" r="1.8" opacity="0.16"/>
+    <circle cx="1344" cy="722" r="1.4" opacity="0.14"/>
+  </g>
+
+  <!-- overall edge falloff: keeps type legible without flattening the room -->
+  <rect width="1920" height="1200" fill="url(#room)" opacity="0.12"/>
+</svg>
