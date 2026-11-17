@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useSectionPhase } from "../ui/SectionContent";
 
 /**
@@ -30,6 +31,17 @@ import { useSectionPhase } from "../ui/SectionContent";
  * Base CSS for every encounter describes the settled composition, so the reset
  * only clears the decorative technique state — the description, gallery, links
  * and record stay readable the whole time.
+ *
+ * PHASE 6.15 — the attribute flip is committed synchronously.
+ *
+ * The replay was reported as still missing when coming back up the page. It was
+ * not missing an observer event: the observer fired correctly in both
+ * directions, but its `setInView` sat in React's queued update behind a busy
+ * frame, so `data-active` still described the *previous* scroll position by the
+ * time the stage was on screen. The CSS timeline is keyed off that attribute, so
+ * the technique started a whole step late (and appeared not to restart at all).
+ * Committing inside the callback puts the attribute in the DOM in the same task
+ * as the intersection change, which is what a decorative timeline needs.
  */
 export function useEncounterActive<T extends HTMLElement>(options?: {
   /** Bottom shave on the root, so a stage must be genuinely in the band. */
@@ -54,7 +66,7 @@ export function useEncounterActive<T extends HTMLElement>(options?: {
 
         if (!entry.isIntersecting) {
           // Fully out of the band: the next entry replays the technique.
-          setInView(false);
+          flushSync(() => setInView(false));
           return;
         }
 
@@ -68,7 +80,9 @@ export function useEncounterActive<T extends HTMLElement>(options?: {
           entry.boundingClientRect.height * 0.5,
           viewportHeight * 0.12
         );
-        if (entry.intersectionRect.height >= needed) setInView(true);
+        if (entry.intersectionRect.height >= needed) {
+          flushSync(() => setInView(true));
+        }
       },
       { threshold: [0, 0.05, 0.15], rootMargin }
     );

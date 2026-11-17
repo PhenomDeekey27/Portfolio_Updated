@@ -31,11 +31,23 @@
 }
 
 html {
+  /* PHASE 6.15 — the gutter is reserved for the desktop scrollbar only.
+     On a phone there is no classic scrollbar, but Chromium still subtracted a
+     10px gutter from the root box: every full-bleed stage (100vw) then bled 5px
+     past the left edge while the right edge stopped short, so the whole page
+     read as pushed left with an empty strip down the side. Phones get no
+     gutter; the lock-shift it guards against only exists with a real bar. */
+  scrollbar-gutter: auto;
   scroll-behavior: smooth;
   background-color: var(--color-void);
-  /* Keep the scrollbar gutter reserved while a transition locks scrolling so
-     the layout never shifts horizontally when the lock engages/releases. */
-  scrollbar-gutter: stable;
+}
+
+/* From tablet up a real scrollbar exists, so the gutter stays reserved while a
+   transition locks scrolling — the layout must not shift when it engages. */
+@media (min-width: 768px) {
+  html {
+    scrollbar-gutter: stable;
+  }
 }
 
 body {
@@ -5910,38 +5922,60 @@ p {
 }
 
 /*
- * PHASE 6.14 — animated wind layers.
+ * PHASE 6.15 — composited plates.
  *
- * Phase 6.13's diagnosis showed the whole per-frame cost of this encounter sat
- * in the full-viewport field SVG: ~150 elements animating independently, most
- * of them stroke-dashoffset draws and drop-shadow filtered paths, forced a
- * re-raster of the entire 1440x900 layer every frame.
+ * Phase 6.14 reduced the field to one timeline per layer group, and the paint
+ * cost barely moved: an animated SVG child group is not composited, so the
+ * whole 1.4-megapixel root re-rastered every frame. Halving the painted area
+ * restored the frame rate, which pinned the residual cost on raster area.
  *
- * The geometry is unchanged. What changed is the animation unit: each layer
- * now has one timeline, expressed only in transform and opacity, and the four
- * heaviest layers are promoted so a frame repaints one layer instead of the
- * whole stage.
+ * The field is now six separate SVG boxes — air, flow, travel, form, impulse,
+ * release — and only the box itself animates. Nothing inside a plate runs its
+ * own timeline, so each plate rasterises once and the compositor moves it.
+ * `transform` and `opacity` at plate level are the only animated properties.
  */
-.wnd-strata,
-.wnd-ribbons,
-.wnd-currents,
-.wnd-vortex,
-.wnd-spirals,
-.wnd-arcs,
-.wnd-gusts,
-.wnd-formation,
-.wnd-travel,
-.wnd-wave-ribs,
-.wnd-sprays {
-  transform-box: view-box;
-  transform-origin: 720px 450px;
+.wnd-plate {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Backface/rounding free translate so the plate gets its own layer. */
+  transform: translateZ(0);
 }
 
-/* Transient layers own their own visibility, so their children can stay
-   painted once and be faded as a group. */
-.wnd-travel,
-.wnd-wave-ribs,
-.wnd-sprays {
+.wnd-plate-air {
+  z-index: 1;
+}
+
+.wnd-plate-flow {
+  z-index: 2;
+}
+
+.wnd-plate-travel {
+  z-index: 3;
+}
+
+.wnd-plate-form {
+  z-index: 4;
+}
+
+.wnd-plate-impulse {
+  z-index: 5;
+}
+
+.wnd-plate-release {
+  z-index: 6;
+}
+
+/* The settled composition: the two gathering bands and the formation are on
+   screen, the transient plates are spent. Every plate animation below ends on
+   exactly this state, so the animation is removable without changing the
+   resting frame. */
+.wnd-plate-travel,
+.wnd-plate-impulse,
+.wnd-plate-release {
   opacity: 0;
 }
 
@@ -5964,12 +5998,14 @@ p {
   filter: drop-shadow(0 0 14px rgb(165 243 252 / 0.75));
 }
 
+/* Inside the plates these children are always painted; the plate's own
+   opacity decides whether the beat is on screen. */
 .wnd-pulse,
 .wnd-pulse-core,
 .wnd-shock,
 .wnd-sheet,
 .wnd-wave-ring {
-  opacity: 0;
+  opacity: 1;
 }
 
 .wnd-wave-rib {
@@ -5989,8 +6025,14 @@ p {
 .wnd-mote {
   position: absolute;
   border-radius: 999px;
-  background: rgb(var(--wnd-ice) / 0.9);
-  box-shadow: 0 0 10px rgb(var(--wnd-aqua) / 0.5);
+  /* PHASE 6.15: a radial-gradient glow replaces the blurred box-shadow so the
+     mote no longer forces a per-element filter paint on 26 small elements. */
+  background: radial-gradient(
+    circle,
+    rgb(var(--wnd-ice) / 0.95) 0%,
+    rgb(var(--wnd-aqua) / 0.55) 45%,
+    rgb(var(--wnd-aqua) / 0) 100%
+  );
   opacity: 0;
 }
 
@@ -6995,225 +7037,99 @@ p {
   }
 }
 
-@keyframes wnd-core-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  58% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.92;
-    transform: scale(1);
-  }
-}
-
-@keyframes wnd-shock-out {
-  0% {
-    opacity: 0;
-    transform: scale(0.72);
-  }
-  18% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2.55);
-  }
-}
-
-@keyframes wnd-sheet-out {
-  0% {
-    opacity: 0;
-    transform: scale(1, 1);
-  }
-  20% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(5.8, 1.75);
-  }
-}
-
-@keyframes wnd-wave-ring-out {
-  0% {
-    opacity: 0;
-    transform: scale(1, 1);
-  }
-  22% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(4.6, 1.9);
-  }
-}
-
-@keyframes wnd-ignite-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-  46% {
-    opacity: 1;
-    transform: scale(1.5);
-  }
-  /* Settles into a soft core rather than a hard white dot over the wordmark. */
-  100% {
-    opacity: 0.58;
-    transform: scale(0.86);
-  }
-}
-
 /* PHASE 6.14 — layer timelines. Transform and opacity only: no stroke-dashoffset,
    which forced a full-viewport re-raster on every frame of the sequence. */
 
-@keyframes wnd-layer-in-right {
+@keyframes wnd-plate-right {
   from {
     opacity: 0;
-    transform: translate3d(4.5%, 0, 0) scale(1.015);
+    transform: translate3d(8%, 0, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
-@keyframes wnd-layer-in-left {
+@keyframes wnd-plate-left {
   from {
     opacity: 0;
-    transform: translate3d(-4.5%, 0, 0) scale(1.015);
+    transform: translate3d(-8%, 0, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
-@keyframes wnd-turn-in {
-  from {
-    opacity: 0;
-    transform: rotate(-16deg) scale(0.93);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-  }
-}
-
-@keyframes wnd-scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes wnd-gusts-in {
-  from {
-    opacity: 0;
-    transform: scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes wnd-travel-group {
+/* Motes ride the currents in, then hand over to the formation. */
+@keyframes wnd-plate-travel {
   0% {
     opacity: 0;
-    transform: translate3d(-2.5%, 1.6%, 0) scale(0.97);
+    transform: translate3d(-6%, 1%, 0);
   }
   26% {
     opacity: 1;
   }
-  72% {
-    opacity: 0.75;
+  62% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(3%, -1%, 0);
   }
 }
 
-@keyframes wnd-ribs-sweep {
-  0% {
+/* The formation closes and stays; the plate ends on the settled frame. */
+@keyframes wnd-plate-form {
+  from {
     opacity: 0;
-    transform: translate3d(-5%, 0, 0) scale(1.06, 0.94);
+    transform: scale(0.9);
   }
-  32% {
+  60% {
     opacity: 1;
   }
-  100% {
-    opacity: 0;
-    transform: translate3d(5%, 0, 0) scale(1.1, 1.02);
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
-@keyframes wnd-spray-group {
+/* The core ignites and its shockwave passes through. */
+@keyframes wnd-plate-impulse {
   0% {
     opacity: 0;
-    transform: scale(0.42);
+    transform: scale(0.36);
   }
   18% {
     opacity: 1;
   }
-  100% {
-    opacity: 0;
-    transform: scale(1.9);
-  }
-}
-
-@keyframes wnd-formation-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.78);
-  }
-  34% {
-    opacity: 0.9;
-    transform: scale(1);
-  }
-  62% {
-    opacity: 0.95;
-    transform: scale(1.045);
-  }
-  100% {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-}
-
-@keyframes wnd-pulse-out {
-  0% {
-    opacity: 0;
-    transform: scale(0.24);
-  }
-  22% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2.5);
-  }
-}
-
-@keyframes wnd-pulse-core-out {
-  0% {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-  30% {
+  55% {
     opacity: 0.55;
   }
   100% {
     opacity: 0;
-    transform: scale(1.9);
+    transform: scale(1.6);
+  }
+}
+
+/* The release expands across the stage and disperses. */
+@keyframes wnd-plate-release {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+  22% {
+    opacity: 0.85;
+  }
+  55% {
+    opacity: 0.5;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
   }
 }
 
@@ -7311,91 +7227,30 @@ p {
     animation-name: wnd-mote-in-d;
   }
 
-  /* STAGE 2 — gathering: three layers sweep in from the edges. */
-  .wnd[data-active="true"] .wnd-strata {
-    animation: wnd-layer-in-right 1500ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  /* STAGE 2-4 — one timeline per plate, transform and opacity only.
+     The plates rasterise once; the compositor moves them. */
+  .wnd[data-active="true"] .wnd-plate-air {
+    animation: wnd-plate-right 1650ms cubic-bezier(0.2, 0.7, 0.2, 1) 90ms both;
   }
 
-  .wnd[data-active="true"] .wnd-ribbons {
-    animation: wnd-layer-in-right 1650ms cubic-bezier(0.2, 0.7, 0.2, 1) 90ms both;
-    will-change: transform, opacity;
+  .wnd[data-active="true"] .wnd-plate-flow {
+    animation: wnd-plate-left 1500ms cubic-bezier(0.2, 0.7, 0.2, 1) 60ms both;
   }
 
-  .wnd[data-active="true"] .wnd-currents {
-    animation: wnd-layer-in-left 1500ms cubic-bezier(0.2, 0.7, 0.2, 1) 60ms both;
-    will-change: transform, opacity;
+  .wnd[data-active="true"] .wnd-plate-travel {
+    animation: wnd-plate-travel 1900ms cubic-bezier(0.3, 0.5, 0.4, 1) 280ms both;
   }
 
-  .wnd[data-active="true"] .wnd-travel {
-    animation: wnd-travel-group 1900ms cubic-bezier(0.3, 0.5, 0.4, 1) 280ms both;
+  .wnd[data-active="true"] .wnd-plate-form {
+    animation: wnd-plate-form 1700ms cubic-bezier(0.22, 1, 0.36, 1) 520ms both;
   }
 
-  /* STAGE 3 — protective formation */
-  .wnd[data-active="true"] .wnd-core {
-    animation: wnd-core-in 1500ms cubic-bezier(0.22, 1, 0.36, 1) 900ms both;
+  .wnd[data-active="true"] .wnd-plate-impulse {
+    animation: wnd-plate-impulse 1900ms cubic-bezier(0.16, 1, 0.3, 1) 1180ms both;
   }
 
-  .wnd[data-active="true"] .wnd-formation {
-    animation: wnd-formation-in 1700ms cubic-bezier(0.22, 1, 0.36, 1) 520ms both;
-    will-change: transform, opacity;
-  }
-
-  .wnd[data-active="true"] .wnd-vortex {
-    animation: wnd-turn-in 1600ms cubic-bezier(0.2, 0.7, 0.2, 1) 360ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-spirals {
-    animation: wnd-scale-in 1800ms cubic-bezier(0.2, 0.7, 0.2, 1) 440ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-arcs {
-    animation: wnd-scale-in 1300ms cubic-bezier(0.2, 0.7, 0.2, 1) 620ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-gusts {
-    animation: wnd-gusts-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) 780ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-ignite {
-    animation: wnd-ignite-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) 1180ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-shock-a {
-    animation: wnd-shock-out 2500ms cubic-bezier(0.16, 1, 0.3, 1) 1560ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-shock-b {
-    animation: wnd-shock-out 2500ms cubic-bezier(0.16, 1, 0.3, 1) 1780ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-pulse {
-    animation: wnd-pulse-out 2200ms cubic-bezier(0.16, 1, 0.3, 1) 1500ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-pulse-core {
-    animation: wnd-pulse-core-out 2300ms cubic-bezier(0.16, 1, 0.3, 1) 1440ms both;
-  }
-
-  /* STAGE 4 — release */
-  .wnd[data-active="true"] .wnd-sheet {
-    animation: wnd-sheet-out 1500ms cubic-bezier(0.16, 1, 0.3, 1) 2260ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-wave-ring-a {
-    animation: wnd-wave-ring-out 1650ms cubic-bezier(0.16, 1, 0.3, 1) 2280ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-wave-ring-b {
-    animation: wnd-wave-ring-out 1650ms cubic-bezier(0.16, 1, 0.3, 1) 2420ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-wave-ribs {
-    animation: wnd-ribs-sweep 1750ms cubic-bezier(0.3, 0.6, 0.3, 1) 2240ms both;
-  }
-
-  .wnd[data-active="true"] .wnd-sprays {
-    animation: wnd-spray-group 1750ms cubic-bezier(0.16, 1, 0.3, 1) 2240ms both;
-    will-change: transform, opacity;
+  .wnd[data-active="true"] .wnd-plate-release {
+    animation: wnd-plate-release 2000ms cubic-bezier(0.16, 1, 0.3, 1) 2200ms both;
   }
 
   /* STAGE 5 — the record opens through the gap */
@@ -7589,6 +7444,7 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .wnd-plate,
   .wnd-atmos,
   .wnd-stratum,
   .wnd-ribbon,
@@ -10883,5 +10739,49 @@ p {
 
   .fyr[data-active="true"] .fyr-spiral {
     animation: fyr-turn 46s linear infinite;
+  }
+}
+
+/* =========================================================================
+   PHASE 6.15 — PHONE COMPOSITION
+
+   Every encounter's copy column is full width below 640px, so the rank badge —
+   which is absolutely positioned at the top-right of the stage — landed on top
+   of the centred kicker ("RECORD 02 · WIND RELEASE" with an S over its last
+   word). There is no side band to move it into on a phone, so it becomes a
+   small centred seal above the kicker: still present, still announced as the
+   mission rank, and no longer sitting on a line of text.
+   ========================================================================= */
+@media (max-width: 767px) {
+  .bw-rank,
+  .wnd-rank,
+  .wtr-rank,
+  .fyr-rank {
+    position: static;
+    order: -1;
+    justify-self: center;
+    height: 30px;
+    width: 30px;
+    margin-bottom: 12px;
+    font-size: 0.86rem;
+    line-height: 1;
+    backdrop-filter: none;
+  }
+}
+
+/* The sand chamber keeps a full-viewport stage on desktop; on a phone that left
+   a tall empty band under the copy on 390- and 430-wide screens. It hugs its
+   content here, like the other three encounters. */
+@media (max-width: 639px) {
+  .bw-stage {
+    min-height: auto;
+    padding-block: 92px 88px;
+  }
+
+  .wnd-stage,
+  .wtr-stage,
+  .fyr-stage {
+    padding-top: 88px;
+    padding-bottom: 88px;
   }
 }

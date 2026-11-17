@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -93,9 +93,29 @@ function OrbitGroup() {
 }
 
 export default function SkillsCanvas() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  // PHASE 6.15 — stop rendering the orbit scene while it is off screen, the way
+  // HiddenLeafWorld does. The skill ring is only ever read inside its own band.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => setIsVisible(entries[entries.length - 1]?.isIntersecting ?? false),
+      { threshold: 0.01 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="relative w-full h-[400px] md:h-[500px] cursor-grab active:cursor-grabbing">
+    <div
+      ref={containerRef}
+      className="relative w-full h-[400px] md:h-[500px] cursor-grab active:cursor-grabbing"
+    >
       <Canvas
+        frameloop={isVisible ? "always" : "never"}
         camera={{ position: [0, 0, 4.5], fov: 60 }}
         gl={{ antialias: true, alpha: true }}
       >

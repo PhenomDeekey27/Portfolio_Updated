@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -96,9 +96,32 @@ function Particles() {
 }
 
 export default function HeroCanvas() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  // PHASE 6.15 — this scene used to keep rendering a full-viewport WebGL frame
+  // for the whole page, including the thousands of pixels of mission content
+  // below the hero. On the ResQ stage it was the single largest frame cost, and
+  // none of it was visible. Same gate as HiddenLeafWorld.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      (entries) => setIsVisible(entries[entries.length - 1]?.isIntersecting ?? false),
+      { threshold: 0.01 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="absolute inset-0 z-0 h-full w-full pointer-events-none">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 z-0 h-full w-full pointer-events-none"
+    >
       <Canvas 
+        dpr={[1, 1.5]}
+        frameloop={isVisible ? 'always' : 'never'}
         camera={{ position: [0, 0, 4.0], fov: 60 }}
         gl={{ antialias: true, alpha: true }}
       >

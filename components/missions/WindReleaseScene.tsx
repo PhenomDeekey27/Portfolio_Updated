@@ -29,15 +29,27 @@ import { useEncounterActive } from "./useEncounterActive";
  * re-arms the timeline on every entry into the reading band (phase 6.13), so
  * reduced motion and a failed observer still show the complete scene.
  *
- * PHASE 6.14 — the choreography above is unchanged, but it no longer runs one
- * animation per element. Measurement pinned the entire per-frame cost on this
- * full-viewport SVG: ~150 independently animated children, most of them
- * stroke-dashoffset draws, meant the whole layer re-rasterised every frame.
- * Each layer (`wnd-strata`, `wnd-ribbons`, `wnd-currents`, `wnd-vortex`,
- * `wnd-spirals`, `wnd-arcs`, `wnd-gusts`, `wnd-formation`, `wnd-travel`,
- * `wnd-wave-ribs`, `wnd-sprays`, `wnd-release`) now has a single transform and
- * opacity timeline, and the heaviest four are promoted to their own layer. The
- * geometry, gradients, timing and staging are untouched.
+ * PHASE 6.14 — one animation per layer group instead of one per element.
+ *
+ * PHASE 6.15 — the field is now six separate `<svg>` plates, one per depth
+ * band. Phase 6.14 removed the per-element timelines, but the measurement still
+ * showed the stage repainting a 1.4-megapixel SVG every frame: an SVG child
+ * group animation is not composited, so the *whole* root re-rasters each frame
+ * no matter how few timelines drive it. Halving the painted area took the
+ * scene from 21 to 48 fps, which pinned the cost on raster area rather than on
+ * animation count or property choice.
+ *
+ * So each band is its own SVG box and animates only `transform`/`opacity` at the
+ * plate level. Each plate rasterises once and is then moved by the compositor,
+ * and the choreography is unchanged: the air sweeps in from the right, the
+ * flow from the left, the motes ride to the centre, the formation closes, the
+ * impulse flashes, the release expands and disperses. The interior of every
+ * plate is completely static art — no dashed, hinted, or filtered path runs a
+ * timeline of its own.
+ *
+ * Plates cannot share `<defs>` (a paint server referenced from another SVG root
+ * does not resolve), so each plate carries its own prefixed copy of the eight
+ * gradients.
  */
 
 type Strand = {
@@ -214,6 +226,64 @@ const TRAVEL = Array.from({ length: 18 }, (_, index) => ({
   size: 1.7 + (index % 3) * 0.8,
 }));
 
+/**
+ * PHASE 6.15 — the shared paint servers, duplicated per plate with a prefix.
+ * A gradient defined in one SVG root cannot be referenced from another, so each
+ * plate gets its own copy of the eight it needs.
+ */
+function WindDefs({ id }: { id: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${id}-current-core`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#0895a7" stopOpacity="0" />
+        <stop offset="0.42" stopColor="#67e8f9" stopOpacity="0.7" />
+        <stop offset="1" stopColor="#0895a7" stopOpacity="1" />
+      </linearGradient>
+      <linearGradient id={`${id}-current-edge`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#67e8f9" stopOpacity="0" />
+        <stop offset="0.6" stopColor="#a5f3fc" stopOpacity="0.45" />
+        <stop offset="1" stopColor="#0895a7" stopOpacity="0.75" />
+      </linearGradient>
+      <linearGradient id={`${id}-ribbon`} x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0" stopColor="#0895a7" stopOpacity="0" />
+        <stop offset="0.3" stopColor="#67e8f9" stopOpacity="0.24" />
+        <stop offset="0.66" stopColor="#a5f3fc" stopOpacity="0.15" />
+        <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
+      </linearGradient>
+      <linearGradient id={`${id}-strata`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#0b4a55" stopOpacity="0" />
+        <stop offset="0.38" stopColor="#0895a7" stopOpacity="0.24" />
+        <stop offset="0.74" stopColor="#67e8f9" stopOpacity="0.16" />
+        <stop offset="1" stopColor="#0b4a55" stopOpacity="0" />
+      </linearGradient>
+      <linearGradient id={`${id}-wave-rib`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#a5f3fc" stopOpacity="0" />
+        <stop offset="0.4" stopColor="#a5f3fc" stopOpacity="0.5" />
+        <stop offset="0.7" stopColor="#67e8f9" stopOpacity="0.26" />
+        <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
+      </linearGradient>
+      <radialGradient id={`${id}-core-fill`}>
+        <stop offset="0" stopColor="#c9fbfe" stopOpacity="0.3" />
+        <stop offset="0.34" stopColor="#67e8f9" stopOpacity="0.14" />
+        <stop offset="0.7" stopColor="#0895a7" stopOpacity="0.06" />
+        <stop offset="1" stopColor="#070806" stopOpacity="0" />
+      </radialGradient>
+      <radialGradient id={`${id}-pulse-fill`}>
+        <stop offset="0" stopColor="#a5f3fc" stopOpacity="0.55" />
+        <stop offset="0.5" stopColor="#0895a7" stopOpacity="0.3" />
+        <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
+      </radialGradient>
+      <radialGradient id={`${id}-sheet-fill`}>
+        <stop offset="0" stopColor="#a5f3fc" stopOpacity="0.22" />
+        <stop offset="0.46" stopColor="#67e8f9" stopOpacity="0.14" />
+        <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
+      </radialGradient>
+    </defs>
+  );
+}
+
+const PLATE_VIEWBOX = "0 0 1440 900";
+
 export default function WindReleaseScene({
   mission,
   index,
@@ -238,69 +308,25 @@ export default function WindReleaseScene({
         <span className="wnd-atmos" aria-hidden="true" />
         <span className="wnd-veil" aria-hidden="true" />
 
+        {/* PHASE 6.15 — six composited plates, one per depth band. */}
         <div className="wnd-field" aria-hidden="true">
-          <svg
-            className="wnd-field-svg"
-            viewBox="0 0 1440 900"
+          {/* AIR — far strata and the broad translucent ribbons */}
+          <div className="wnd-plate wnd-plate-air">
+            <svg
+              style={{ width: "100%", height: "100%", display: "block" }}
+            viewBox={PLATE_VIEWBOX}
             preserveAspectRatio="xMidYMid slice"
             fill="none"
             focusable="false"
           >
-            <defs>
-              <linearGradient id="wnd-current-core" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="#0895a7" stopOpacity="0" />
-                <stop offset="0.42" stopColor="#67e8f9" stopOpacity="0.7" />
-                <stop offset="1" stopColor="#0895a7" stopOpacity="1" />
-              </linearGradient>
-              <linearGradient id="wnd-current-edge" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="#67e8f9" stopOpacity="0" />
-                <stop offset="0.6" stopColor="#a5f3fc" stopOpacity="0.45" />
-                <stop offset="1" stopColor="#0895a7" stopOpacity="0.75" />
-              </linearGradient>
-              <linearGradient id="wnd-ribbon" x1="0" y1="1" x2="1" y2="0">
-                <stop offset="0" stopColor="#0895a7" stopOpacity="0" />
-                <stop offset="0.3" stopColor="#67e8f9" stopOpacity="0.24" />
-                <stop offset="0.66" stopColor="#a5f3fc" stopOpacity="0.15" />
-                <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
-              </linearGradient>
-              <linearGradient id="wnd-strata" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="#0b4a55" stopOpacity="0" />
-                <stop offset="0.38" stopColor="#0895a7" stopOpacity="0.24" />
-                <stop offset="0.74" stopColor="#67e8f9" stopOpacity="0.16" />
-                <stop offset="1" stopColor="#0b4a55" stopOpacity="0" />
-              </linearGradient>
-              <linearGradient id="wnd-wave-rib" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="#a5f3fc" stopOpacity="0" />
-                <stop offset="0.4" stopColor="#a5f3fc" stopOpacity="0.5" />
-                <stop offset="0.7" stopColor="#67e8f9" stopOpacity="0.26" />
-                <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
-              </linearGradient>
-              <radialGradient id="wnd-core-fill">
-                <stop offset="0" stopColor="#c9fbfe" stopOpacity="0.3" />
-                <stop offset="0.34" stopColor="#67e8f9" stopOpacity="0.14" />
-                <stop offset="0.7" stopColor="#0895a7" stopOpacity="0.06" />
-                <stop offset="1" stopColor="#070806" stopOpacity="0" />
-              </radialGradient>
-              <radialGradient id="wnd-pulse-fill">
-                <stop offset="0" stopColor="#a5f3fc" stopOpacity="0.55" />
-                <stop offset="0.5" stopColor="#0895a7" stopOpacity="0.3" />
-                <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
-              </radialGradient>
-              <radialGradient id="wnd-sheet-fill">
-                <stop offset="0" stopColor="#a5f3fc" stopOpacity="0.22" />
-                <stop offset="0.46" stopColor="#67e8f9" stopOpacity="0.14" />
-                <stop offset="1" stopColor="#0895a7" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-
-            {/* STAGE 2 — far strata entering from both edges */}
+            <WindDefs id="wnd-air" />
             <g className="wnd-strata">
               {STRATA.map((strand, strandIndex) => (
                 <path
                   key={`strata-${strandIndex}`}
                   className="wnd-stratum"
                   d={strand.d}
-                  stroke="url(#wnd-strata)"
+                  stroke="url(#wnd-air-strata)"
                   strokeWidth={strand.width}
                   strokeLinecap="round"
                 />
@@ -311,7 +337,7 @@ export default function WindReleaseScene({
                     key={`strata-m-${strandIndex}`}
                     className="wnd-stratum"
                     d={strand.d}
-                    stroke="url(#wnd-strata)"
+                    stroke="url(#wnd-air-strata)"
                     strokeWidth={strand.width}
                     strokeLinecap="round"
                   />
@@ -319,48 +345,13 @@ export default function WindReleaseScene({
               </g>
             </g>
 
-            {/* STAGE 2 — circulating air rings */}
-            <g className="wnd-vortex">
-              {VORTEX.map((ring, ringIndex) => (
-                <circle
-                  key={`vortex-${ringIndex}`}
-                  className="wnd-vortex-ring"
-                  cx="720"
-                  cy="450"
-                  r={ring.r}
-                  stroke="url(#wnd-current-edge)"
-                  strokeOpacity={ring.opacity}
-                  strokeWidth={ring.width}
-                  strokeLinecap="round"
-                  strokeDasharray={ring.dash}
-                  transform={`rotate(${ring.rotate} 720 450)`}
-                />
-              ))}
-            </g>
-
-            {/* STAGE 2 — the air wrapping the technique */}
-            <g className="wnd-spirals">
-              {SPIRALS.map((spiral, spiralIndex) => (
-                <path
-                  key={`spiral-${spiralIndex}`}
-                  className="wnd-spiral"
-                  d={spiral.d}
-                  stroke="url(#wnd-current-edge)"
-                  strokeOpacity={spiral.opacity}
-                  strokeWidth={spiral.width}
-                  strokeLinecap="round"
-                />
-              ))}
-            </g>
-
-            {/* STAGE 2 — broad translucent ribbons */}
             <g className="wnd-ribbons">
               {RIBBONS.map((ribbon, ribbonIndex) => (
                 <path
                   key={`ribbon-${ribbonIndex}`}
                   className="wnd-ribbon"
                   d={ribbon.d}
-                  stroke="url(#wnd-ribbon)"
+                  stroke="url(#wnd-air-ribbon)"
                   strokeWidth={ribbon.width}
                   strokeLinecap="round"
                 />
@@ -371,22 +362,65 @@ export default function WindReleaseScene({
                     key={`ribbon-m-${ribbonIndex}`}
                     className="wnd-ribbon"
                     d={ribbon.d}
-                    stroke="url(#wnd-ribbon)"
+                    stroke="url(#wnd-air-ribbon)"
                     strokeWidth={ribbon.width}
                     strokeLinecap="round"
                   />
                 ))}
               </g>
             </g>
+          </svg>
+          </div>
 
-            {/* STAGE 2 — converging currents */}
+          {/* FLOW — vortex band, spirals and the converging currents */}
+          <div className="wnd-plate wnd-plate-flow">
+            <svg
+              style={{ width: "100%", height: "100%", display: "block" }}
+            viewBox={PLATE_VIEWBOX}
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
+            focusable="false"
+          >
+            <WindDefs id="wnd-flow" />
+            <g className="wnd-vortex">
+              {VORTEX.map((ring, ringIndex) => (
+                <circle
+                  key={`vortex-${ringIndex}`}
+                  className="wnd-vortex-ring"
+                  cx="720"
+                  cy="450"
+                  r={ring.r}
+                  stroke="url(#wnd-flow-current-edge)"
+                  strokeOpacity={ring.opacity}
+                  strokeWidth={ring.width}
+                  strokeLinecap="round"
+                  strokeDasharray={ring.dash}
+                  transform={`rotate(${ring.rotate} 720 450)`}
+                />
+              ))}
+            </g>
+
+            <g className="wnd-spirals">
+              {SPIRALS.map((spiral, spiralIndex) => (
+                <path
+                  key={`spiral-${spiralIndex}`}
+                  className="wnd-spiral"
+                  d={spiral.d}
+                  stroke="url(#wnd-flow-current-edge)"
+                  strokeOpacity={spiral.opacity}
+                  strokeWidth={spiral.width}
+                  strokeLinecap="round"
+                />
+              ))}
+            </g>
+
             <g className="wnd-currents">
               {CURRENTS.map((current, currentIndex) => (
                 <path
                   key={`current-${currentIndex}`}
                   className="wnd-current"
                   d={current.d}
-                  stroke={`url(#wnd-current-${current.tone})`}
+                  stroke={`url(#wnd-flow-current-${current.tone})`}
                   strokeWidth={current.width}
                   strokeLinecap="round"
                 />
@@ -397,15 +431,25 @@ export default function WindReleaseScene({
                     key={`current-m-${currentIndex}`}
                     className="wnd-current"
                     d={current.d}
-                    stroke={`url(#wnd-current-${current.tone})`}
+                    stroke={`url(#wnd-flow-current-${current.tone})`}
                     strokeWidth={current.width}
                     strokeLinecap="round"
                   />
                 ))}
               </g>
             </g>
+          </svg>
+          </div>
 
-            {/* STAGE 2 — motes carried along the currents */}
+          {/* TRAVEL — motes riding the currents to the centre */}
+          <div className="wnd-plate wnd-plate-travel">
+            <svg
+              style={{ width: "100%", height: "100%", display: "block" }}
+            viewBox={PLATE_VIEWBOX}
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
+            focusable="false"
+          >
             <g className="wnd-travel">
               {TRAVEL.map((mote, moteIndex) => (
                 <circle
@@ -418,14 +462,25 @@ export default function WindReleaseScene({
                 />
               ))}
             </g>
+          </svg>
+          </div>
 
-            {/* STAGE 3 — protective formation */}
+          {/* FORM — the protective ring that stays */}
+          <div className="wnd-plate wnd-plate-form">
+            <svg
+              style={{ width: "100%", height: "100%", display: "block" }}
+            viewBox={PLATE_VIEWBOX}
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
+            focusable="false"
+          >
+            <WindDefs id="wnd-form" />
             <circle
               className="wnd-core"
               cx="720"
               cy="450"
               r="330"
-              fill="url(#wnd-core-fill)"
+              fill="url(#wnd-form-core-fill)"
             />
 
             <g className="wnd-formation">
@@ -501,8 +556,19 @@ export default function WindReleaseScene({
                 ))}
               </g>
             </g>
+          </svg>
+          </div>
 
-            {/* STAGE 3/4 — energy rings and central pulse */}
+          {/* IMPULSE — the core igniting and its shockwave */}
+          <div className="wnd-plate wnd-plate-impulse">
+            <svg
+              style={{ width: "100%", height: "100%", display: "block" }}
+            viewBox={PLATE_VIEWBOX}
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
+            focusable="false"
+          >
+            <WindDefs id="wnd-impulse" />
             <circle className="wnd-ignite" cx="720" cy="450" r="16" fill="#d6feff" />
 
             <g className="wnd-shocks">
@@ -531,7 +597,7 @@ export default function WindReleaseScene({
               cx="720"
               cy="450"
               r="210"
-              fill="url(#wnd-pulse-fill)"
+              fill="url(#wnd-impulse-pulse-fill)"
             />
             <circle
               className="wnd-pulse"
@@ -542,64 +608,74 @@ export default function WindReleaseScene({
               strokeOpacity="0.55"
               strokeWidth="2.4"
             />
+          </svg>
+          </div>
 
-            {/* STAGE 4 — the release: an anisotropic wind wave + spray */}
-            <g className="wnd-release">
-              <ellipse
-                className="wnd-sheet"
-                cx="720"
-                cy="450"
-                rx="232"
-                ry="232"
-                fill="url(#wnd-sheet-fill)"
-              />
-              <ellipse
-                className="wnd-wave-ring wnd-wave-ring-a"
-                cx="720"
-                cy="450"
-                rx="250"
-                ry="250"
-                stroke="#a5f3fc"
-                strokeOpacity="0.45"
-                strokeWidth="1.6"
-              />
-              <ellipse
-                className="wnd-wave-ring wnd-wave-ring-b"
-                cx="720"
-                cy="450"
-                rx="250"
-                ry="250"
-                stroke="#67e8f9"
-                strokeOpacity="0.3"
-                strokeWidth="1"
-              />
-              <g className="wnd-wave-ribs">
-                {WAVE_RIBS.map((rib, ribIndex) => (
-                  <path
-                    key={`rib-${ribIndex}`}
-                    className="wnd-wave-rib"
-                    d={rib.d}
-                    stroke="url(#wnd-wave-rib)"
-                    strokeWidth={rib.width}
-                    strokeLinecap="round"
-                  />
-                ))}
-              </g>
-              <g className="wnd-sprays">
-                {SPRAY.map((drop, dropIndex) => (
-                  <circle
-                    key={`spray-${dropIndex}`}
-                    className="wnd-spray"
-                    cx="720"
-                    cy="450"
-                    r={drop.size}
-                    fill="#d6feff"
-                    opacity={drop.opacity}
-                  />
-                ))}
-              </g>
+          {/* RELEASE — the anisotropic wind wave and its spray */}
+          <div className="wnd-plate wnd-plate-release">
+            <svg
+              style={{ width: "100%", height: "100%", display: "block" }}
+            viewBox={PLATE_VIEWBOX}
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
+            focusable="false"
+          >
+            <WindDefs id="wnd-release" />
+            <ellipse
+              className="wnd-sheet"
+              cx="720"
+              cy="450"
+              rx="232"
+              ry="232"
+              fill="url(#wnd-release-sheet-fill)"
+            />
+            <ellipse
+              className="wnd-wave-ring wnd-wave-ring-a"
+              cx="720"
+              cy="450"
+              rx="250"
+              ry="250"
+              stroke="#a5f3fc"
+              strokeOpacity="0.45"
+              strokeWidth="1.6"
+            />
+            <ellipse
+              className="wnd-wave-ring wnd-wave-ring-b"
+              cx="720"
+              cy="450"
+              rx="250"
+              ry="250"
+              stroke="#67e8f9"
+              strokeOpacity="0.3"
+              strokeWidth="1"
+            />
+            <g className="wnd-wave-ribs">
+              {WAVE_RIBS.map((rib, ribIndex) => (
+                <path
+                  key={`rib-${ribIndex}`}
+                  className="wnd-wave-rib"
+                  d={rib.d}
+                  stroke="url(#wnd-release-wave-rib)"
+                  strokeWidth={rib.width}
+                  strokeLinecap="round"
+                />
+              ))}
+            </g>
+            <g className="wnd-sprays">
+              {SPRAY.map((drop, dropIndex) => (
+                <circle
+                  key={`spray-${dropIndex}`}
+                  className="wnd-spray"
+                  cx="720"
+                  cy="450"
+                  r={drop.size}
+                  fill="#d6feff"
+                  opacity={drop.opacity}
+                />
+              ))}
             </g>
           </svg>
+          </div>
         </div>
 
         {/* STAGE 1 — wind motes in the open air */}
