@@ -5863,18 +5863,17 @@ p {
   stroke-dasharray: 900 2000;
   stroke-dashoffset: 0;
   opacity: 0.5;
-  filter: drop-shadow(0 0 16px rgb(103 232 249 / 0.12));
 }
 
 .wnd-current {
   stroke-dasharray: 340 2200;
   stroke-dashoffset: 0;
   opacity: 0.72;
-  filter: drop-shadow(0 0 8px rgb(103 232 249 / 0.22));
 }
 
+/* Visible at rest; `.wnd-travel` fades the whole flight in and out. */
 .wnd-travel-mote {
-  opacity: 0;
+  opacity: 1;
 }
 
 .wnd-formation,
@@ -5910,9 +5909,40 @@ p {
   opacity: 1;
 }
 
-.wnd-arcs {
-  /* Arcs sit over the glow; the slight dark rim keeps them legible. */
-  filter: drop-shadow(0 0 6px rgb(8 149 167 / 0.55));
+/*
+ * PHASE 6.14 — animated wind layers.
+ *
+ * Phase 6.13's diagnosis showed the whole per-frame cost of this encounter sat
+ * in the full-viewport field SVG: ~150 elements animating independently, most
+ * of them stroke-dashoffset draws and drop-shadow filtered paths, forced a
+ * re-raster of the entire 1440x900 layer every frame.
+ *
+ * The geometry is unchanged. What changed is the animation unit: each layer
+ * now has one timeline, expressed only in transform and opacity, and the four
+ * heaviest layers are promoted so a frame repaints one layer instead of the
+ * whole stage.
+ */
+.wnd-strata,
+.wnd-ribbons,
+.wnd-currents,
+.wnd-vortex,
+.wnd-spirals,
+.wnd-arcs,
+.wnd-gusts,
+.wnd-formation,
+.wnd-travel,
+.wnd-wave-ribs,
+.wnd-sprays {
+  transform-box: view-box;
+  transform-origin: 720px 450px;
+}
+
+/* Transient layers own their own visibility, so their children can stay
+   painted once and be faded as a group. */
+.wnd-travel,
+.wnd-wave-ribs,
+.wnd-sprays {
+  opacity: 0;
 }
 
 .wnd-vortex-ring {
@@ -5938,9 +5968,7 @@ p {
 .wnd-pulse-core,
 .wnd-shock,
 .wnd-sheet,
-.wnd-wave-ring,
-.wnd-wave-rib,
-.wnd-spray {
+.wnd-wave-ring {
   opacity: 0;
 }
 
@@ -6186,6 +6214,132 @@ p {
   padding-inline: 20px;
 }
 
+/*
+ * PHASE 6.14 — the gallery is a two-column composition: the reading column on
+ * the left, the floating deck on the right. Previously the deck sat centred
+ * under a full-width heading, which left a wide empty band beside a fairly
+ * small phone.
+ */
+.wnd-gallery-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .wnd-gallery-split {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(2.5rem, 4vw, 4rem);
+    /* Top-aligned: the reading column starts where the deck starts instead of
+       floating half way down beside it. */
+    align-items: start;
+  }
+
+  .wnd-gallery-copy {
+    padding-top: clamp(0.5rem, 5vh, 3.5rem);
+  }
+
+  .wnd-gallery-float {
+    margin-top: 0;
+  }
+
+  /* The teal bloom belongs behind the deck, not behind the copy. */
+  .wnd-gallery::before {
+    left: 72%;
+    top: 14%;
+    width: min(62vw, 820px);
+    height: 78%;
+  }
+}
+
+.wnd-gallery-copy {
+  max-width: 34rem;
+}
+
+.wnd-gallery-lede {
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgb(var(--wnd-silver) / 0.62);
+}
+
+.wnd-gallery-points {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.wnd-gallery-points li {
+  display: grid;
+  grid-template-columns: 2.1rem minmax(0, 1fr);
+  gap: 2px 10px;
+  border-top: 1px solid rgb(var(--wnd-teal) / 0.16);
+  padding-top: 14px;
+}
+
+.wnd-gallery-index {
+  padding-top: 4px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: rgb(var(--wnd-ice) / 0.45);
+}
+
+.wnd-gallery-points h5 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: rgb(var(--wnd-ivory));
+}
+
+.wnd-gallery-points p {
+  margin-top: 7px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: rgb(var(--wnd-silver) / 0.58);
+}
+
+.wnd-gallery-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-top: 26px;
+  border-top: 1px solid rgb(var(--wnd-teal) / 0.16);
+  padding-top: 16px;
+}
+
+.wnd-gallery-meta-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgb(var(--wnd-ice) / 0.45);
+}
+
+.wnd-gallery-meta ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--wnd-silver) / 0.55);
+}
+
+.wnd-gallery-hint {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.7;
+  color: rgb(var(--wnd-silver) / 0.48);
+}
+
 .wnd-gallery-head {
   display: flex;
   align-items: flex-end;
@@ -6266,6 +6420,11 @@ p {
     transform 820ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 620ms ease;
   pointer-events: none;
+}
+
+/* Nine permanently promoted slides held nine composited layers with large
+   screenshots inside them. Promote only while the deck is actually in view. */
+.wnd-carousel[data-live="true"] .wnd-slide {
   will-change: transform, opacity;
 }
 
@@ -6836,85 +6995,6 @@ p {
   }
 }
 
-@keyframes wnd-stratum-in {
-  from {
-    opacity: 0;
-    stroke-dashoffset: 1000;
-  }
-  to {
-    opacity: 0.65;
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes wnd-travel-a {
-  0% {
-    opacity: 0;
-    transform: translate(-452px, 190px);
-  }
-  16% {
-    opacity: 0.9;
-  }
-  58% {
-    transform: translate(-236px, 62px);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-28px, 4px);
-  }
-}
-
-@keyframes wnd-travel-b {
-  0% {
-    opacity: 0;
-    transform: translate(-436px, -46px);
-  }
-  18% {
-    opacity: 0.8;
-  }
-  62% {
-    transform: translate(-214px, -96px);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-24px, -8px);
-  }
-}
-
-@keyframes wnd-travel-c {
-  0% {
-    opacity: 0;
-    transform: translate(438px, 156px);
-  }
-  17% {
-    opacity: 0.85;
-  }
-  60% {
-    transform: translate(220px, 64px);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(26px, 6px);
-  }
-}
-
-@keyframes wnd-travel-d {
-  0% {
-    opacity: 0;
-    transform: translate(-368px, 322px);
-  }
-  20% {
-    opacity: 0.75;
-  }
-  64% {
-    transform: translate(-196px, 208px);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-18px, 86px);
-  }
-}
-
 @keyframes wnd-core-in {
   0% {
     opacity: 0;
@@ -6926,17 +7006,6 @@ p {
   100% {
     opacity: 0.92;
     transform: scale(1);
-  }
-}
-
-@keyframes wnd-arc-in {
-  from {
-    opacity: 0;
-    stroke-dashoffset: 620;
-  }
-  to {
-    opacity: 0.95;
-    stroke-dashoffset: 0;
   }
 }
 
@@ -6982,76 +7051,6 @@ p {
   }
 }
 
-@keyframes wnd-rib-sweep {
-  0% {
-    opacity: 0;
-    stroke-dashoffset: 1500;
-  }
-  32% {
-    opacity: 0.75;
-  }
-  100% {
-    opacity: 0;
-    stroke-dashoffset: -1500;
-  }
-}
-
-@keyframes wnd-spray-a {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.6);
-  }
-  14% {
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-840px, -190px) scale(1.5);
-  }
-}
-
-@keyframes wnd-spray-b {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.6);
-  }
-  14% {
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(860px, 120px) scale(1.4);
-  }
-}
-
-@keyframes wnd-spray-c {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.6);
-  }
-  14% {
-    opacity: 0.75;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-540px, 300px) scale(1.3);
-  }
-}
-
-@keyframes wnd-spray-d {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.6);
-  }
-  14% {
-    opacity: 0.75;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(560px, -286px) scale(1.35);
-  }
-}
-
 @keyframes wnd-ignite-in {
   0% {
     opacity: 0;
@@ -7068,14 +7067,106 @@ p {
   }
 }
 
-@keyframes wnd-current-in {
+/* PHASE 6.14 — layer timelines. Transform and opacity only: no stroke-dashoffset,
+   which forced a full-viewport re-raster on every frame of the sequence. */
+
+@keyframes wnd-layer-in-right {
   from {
     opacity: 0;
-    stroke-dashoffset: 460;
+    transform: translate3d(4.5%, 0, 0) scale(1.015);
   }
   to {
-    opacity: 0.72;
-    stroke-dashoffset: 0;
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes wnd-layer-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-4.5%, 0, 0) scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes wnd-turn-in {
+  from {
+    opacity: 0;
+    transform: rotate(-16deg) scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes wnd-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes wnd-gusts-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes wnd-travel-group {
+  0% {
+    opacity: 0;
+    transform: translate3d(-2.5%, 1.6%, 0) scale(0.97);
+  }
+  26% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes wnd-ribs-sweep {
+  0% {
+    opacity: 0;
+    transform: translate3d(-5%, 0, 0) scale(1.06, 0.94);
+  }
+  32% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(5%, 0, 0) scale(1.1, 1.02);
+  }
+}
+
+@keyframes wnd-spray-group {
+  0% {
+    opacity: 0;
+    transform: scale(0.42);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
   }
 }
 
@@ -7112,17 +7203,6 @@ p {
   }
 }
 
-@keyframes wnd-ribbon-in {
-  from {
-    opacity: 0;
-    stroke-dashoffset: 780;
-  }
-  to {
-    opacity: 0.5;
-    stroke-dashoffset: 0;
-  }
-}
-
 @keyframes wnd-pulse-core-out {
   0% {
     opacity: 0;
@@ -7134,20 +7214,6 @@ p {
   100% {
     opacity: 0;
     transform: scale(1.9);
-  }
-}
-
-@keyframes wnd-gust-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-16px);
-  }
-  60% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 0.38;
-    transform: translateX(0);
   }
 }
 
@@ -7245,45 +7311,23 @@ p {
     animation-name: wnd-mote-in-d;
   }
 
-  /* STAGE 2 — gathering */
-  .wnd[data-active="true"] .wnd-stratum {
-    animation-name: wnd-stratum-in;
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-    animation-fill-mode: both;
+  /* STAGE 2 — gathering: three layers sweep in from the edges. */
+  .wnd[data-active="true"] .wnd-strata {
+    animation: wnd-layer-in-right 1500ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 
-  .wnd[data-active="true"] .wnd-ribbon {
-    animation-name: wnd-ribbon-in;
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-    animation-fill-mode: both;
+  .wnd[data-active="true"] .wnd-ribbons {
+    animation: wnd-layer-in-right 1650ms cubic-bezier(0.2, 0.7, 0.2, 1) 90ms both;
+    will-change: transform, opacity;
   }
 
-  .wnd[data-active="true"] .wnd-current {
-    animation-name: wnd-current-in;
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-    animation-fill-mode: both;
+  .wnd[data-active="true"] .wnd-currents {
+    animation: wnd-layer-in-left 1500ms cubic-bezier(0.2, 0.7, 0.2, 1) 60ms both;
+    will-change: transform, opacity;
   }
 
-  .wnd[data-active="true"] .wnd-travel-mote {
-    animation-duration: 1750ms;
-    animation-timing-function: cubic-bezier(0.3, 0.5, 0.4, 1);
-    animation-fill-mode: both;
-  }
-
-  .wnd[data-active="true"] .wnd-travel-0 {
-    animation-name: wnd-travel-a;
-  }
-
-  .wnd[data-active="true"] .wnd-travel-1 {
-    animation-name: wnd-travel-b;
-  }
-
-  .wnd[data-active="true"] .wnd-travel-2 {
-    animation-name: wnd-travel-c;
-  }
-
-  .wnd[data-active="true"] .wnd-travel-3 {
-    animation-name: wnd-travel-d;
+  .wnd[data-active="true"] .wnd-travel {
+    animation: wnd-travel-group 1900ms cubic-bezier(0.3, 0.5, 0.4, 1) 280ms both;
   }
 
   /* STAGE 3 — protective formation */
@@ -7293,31 +7337,23 @@ p {
 
   .wnd[data-active="true"] .wnd-formation {
     animation: wnd-formation-in 1700ms cubic-bezier(0.22, 1, 0.36, 1) 520ms both;
+    will-change: transform, opacity;
   }
 
-  .wnd[data-active="true"] .wnd-arc {
-    animation-name: wnd-arc-in;
-    animation-duration: 1100ms;
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-    animation-fill-mode: both;
+  .wnd[data-active="true"] .wnd-vortex {
+    animation: wnd-turn-in 1600ms cubic-bezier(0.2, 0.7, 0.2, 1) 360ms both;
   }
 
-  .wnd[data-active="true"] .wnd-gust {
-    animation: wnd-gust-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  .wnd[data-active="true"] .wnd-spirals {
+    animation: wnd-scale-in 1800ms cubic-bezier(0.2, 0.7, 0.2, 1) 440ms both;
   }
 
-  .wnd[data-active="true"] .wnd-vortex-ring {
-    animation-name: wnd-arc-in;
-    animation-duration: 1500ms;
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-    animation-fill-mode: both;
+  .wnd[data-active="true"] .wnd-arcs {
+    animation: wnd-scale-in 1300ms cubic-bezier(0.2, 0.7, 0.2, 1) 620ms both;
   }
 
-  .wnd[data-active="true"] .wnd-spiral {
-    animation-name: wnd-arc-in;
-    animation-duration: 1800ms;
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-    animation-fill-mode: both;
+  .wnd[data-active="true"] .wnd-gusts {
+    animation: wnd-gusts-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) 780ms both;
   }
 
   .wnd[data-active="true"] .wnd-ignite {
@@ -7353,33 +7389,13 @@ p {
     animation: wnd-wave-ring-out 1650ms cubic-bezier(0.16, 1, 0.3, 1) 2420ms both;
   }
 
-  .wnd[data-active="true"] .wnd-wave-rib {
-    animation-name: wnd-rib-sweep;
-    animation-duration: 1800ms;
-    animation-timing-function: cubic-bezier(0.3, 0.6, 0.3, 1);
-    animation-fill-mode: both;
+  .wnd[data-active="true"] .wnd-wave-ribs {
+    animation: wnd-ribs-sweep 1750ms cubic-bezier(0.3, 0.6, 0.3, 1) 2240ms both;
   }
 
-  .wnd[data-active="true"] .wnd-spray {
-    animation-duration: 1600ms;
-    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    animation-fill-mode: both;
-  }
-
-  .wnd[data-active="true"] .wnd-spray-0 {
-    animation-name: wnd-spray-a;
-  }
-
-  .wnd[data-active="true"] .wnd-spray-1 {
-    animation-name: wnd-spray-b;
-  }
-
-  .wnd[data-active="true"] .wnd-spray-2 {
-    animation-name: wnd-spray-c;
-  }
-
-  .wnd[data-active="true"] .wnd-spray-3 {
-    animation-name: wnd-spray-d;
+  .wnd[data-active="true"] .wnd-sprays {
+    animation: wnd-spray-group 1750ms cubic-bezier(0.16, 1, 0.3, 1) 2240ms both;
+    will-change: transform, opacity;
   }
 
   /* STAGE 5 — the record opens through the gap */
@@ -7445,6 +7461,14 @@ p {
 
   .wnd-deck {
     height: clamp(420px, 74svh, 760px);
+  }
+}
+
+@media (min-width: 1024px) {
+  /* The deck sizes the phone: 0.462 x height. 82svh keeps the active screen
+     around 290 px wide on a 1366x768 laptop, up from 263 px. */
+  .wnd-deck {
+    height: clamp(540px, 82svh, 880px);
   }
 }
 
@@ -10158,5 +10182,706 @@ p {
   .hs-scroll {
     --hs-h: clamp(160px, 26vh, 220px);
     --hs-w: min(340px, 88vw);
+  }
+}
+/* ==================================================================== */
+/* PHASE 6.13 — MOBILE ENCOUNTER BUDGET                                 */
+/* ==================================================================== */
+
+/*
+ * Identity is unchanged on phones; what changes is the per-frame cost.
+ *
+ * The sand wave is the clearest example: feTurbulence + feDisplacementMap is
+ * re-rasterised across the full viewport for the whole 4.3s transform. Below
+ * the desktop breakpoint the ribbons keep their shape, gradient and speckle
+ * stroke and drop the displacement pass — the ribbon silhouette is the read,
+ * the grain is the garnish.
+ *
+ * The rest of the section rations the decorative layers: fewer grains in
+ * flight, fewer gust marks and droplets, and no drop-shadow filter on the
+ * animated wind strokes (each one re-composites its path every frame).
+ */
+
+@media (max-width: 1023px) {
+  .bw-wave-upper,
+  .bw-wave-lower {
+    filter: none;
+  }
+
+  .bw-motes-stream .bw-mote:nth-child(n + 11),
+  .bw-motes-burst .bw-mote:nth-child(n + 9) {
+    display: none;
+  }
+
+  .wnd-ribbon,
+  .wnd-current {
+    filter: none;
+  }
+
+  .wnd-gusts .wnd-gust:nth-child(n + 17),
+  .wnd-travel .wnd-travel-mote:nth-child(n + 13),
+  /* Sprays share their <g> with the wave ribs, so count within their own type. */
+  .wnd-release .wnd-spray:nth-of-type(n + 15),
+  .wnd-motes .wnd-mote:nth-child(n + 17) {
+    display: none;
+  }
+
+  .wtr-drops .wtr-drop:nth-child(n + 13) {
+    display: none;
+  }
+
+  .wnd-rank,
+  .wtr-rank,
+  .fyr-rank {
+    backdrop-filter: none;
+  }
+}
+/* ==================================================================== */
+/* PHASE 6.13 — MOBILE HIDDEN LEAF CONSTRUCTION                         */
+/* ==================================================================== */
+
+/*
+ * The phone version of the Home world. Same story as the desktop scene, told
+ * with three silhouette layers, a fixed set of lights, a sunset bloom and six
+ * motes. Every moving property is transform or opacity, nothing is filtered,
+ * and the settled state is the base style, so reduced motion or a stalled
+ * phase still shows the finished village.
+ */
+
+.leaf-world {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lw-sun {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 150%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(217 154 99 / 0.26),
+    rgb(217 154 99 / 0.07) 36%,
+    transparent 64%
+  );
+  opacity: 0;
+  transition: opacity 1800ms ease-out;
+}
+
+.leaf-world[data-ready="true"] .lw-sun {
+  opacity: 1;
+}
+
+.lw-haze {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 70%;
+  background:
+    radial-gradient(ellipse 85% 55% at 52% 100%, rgb(255 171 94 / 0.1), transparent 70%),
+    linear-gradient(to top, rgb(6 8 11 / 0.9), rgb(6 8 11 / 0.24) 48%, transparent 80%);
+  opacity: 0;
+  transition: opacity 1500ms ease-out 120ms;
+}
+
+.leaf-world[data-ready="true"] .lw-haze {
+  opacity: 1;
+}
+
+.lw-diorama {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: none;
+  height: 68%;
+  transform: scale(1.035);
+  transition: transform 2600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 1023px) {
+  .lw-diorama {
+    display: block;
+  }
+}
+
+.leaf-world[data-camera="true"] .lw-diorama {
+  transform: none;
+}
+
+.lw-scene {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(to top, transparent, #000 20%);
+  mask-image: linear-gradient(to top, transparent, #000 20%);
+}
+
+/* --- silhouettes --- */
+
+.lw-ridge {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition:
+    transform 1200ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1000ms ease-out;
+}
+
+.leaf-world[data-mountains="true"] .lw-ridge {
+  opacity: 1;
+  transform: none;
+}
+
+.lw-ridge .lw-far {
+  fill: #101b28;
+}
+
+.lw-ridge .lw-pagoda {
+  fill: #0d1722;
+}
+
+.lw-terrace {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    transform 1200ms cubic-bezier(0.22, 1, 0.36, 1) 90ms,
+    opacity 1000ms ease-out 90ms;
+}
+
+.leaf-world[data-terrain="true"] .lw-terrace {
+  opacity: 1;
+  transform: none;
+}
+
+.lw-street {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  transition:
+    transform 1300ms cubic-bezier(0.22, 1, 0.36, 1) 180ms,
+    opacity 1100ms ease-out 180ms;
+}
+
+.leaf-world[data-buildings="true"] .lw-street {
+  opacity: 1;
+  transform: none;
+}
+
+.lw-mid rect:not(.lw-window),
+.lw-near rect:not(.lw-window) {
+  fill: #0a1219;
+}
+
+.lw-near rect:not(.lw-window) {
+  fill: #060a0e;
+}
+
+/* Rim light: a sunset edge on every roofline, never a flat black cut-out. */
+.lw-mid path {
+  fill: #0a1219;
+  stroke: rgb(201 163 95 / 0.22);
+  stroke-width: 0.8;
+}
+
+.lw-near path {
+  fill: #060a0e;
+  stroke: rgb(201 163 95 / 0.14);
+  stroke-width: 0.8;
+}
+
+.lw-torii,
+.lw-lanterns {
+  opacity: 0;
+  transition: opacity 1000ms ease-out 520ms;
+}
+
+.leaf-world[data-buildings="true"] .lw-torii,
+.leaf-world[data-buildings="true"] .lw-lanterns {
+  opacity: 1;
+}
+
+.lw-torii rect {
+  fill: #2a1810;
+}
+
+.lw-post {
+  fill: #100b09;
+}
+
+/* --- illumination --- */
+
+.lw-window {
+  fill: #ffc37a;
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+
+.lw-terrace .lw-window {
+  transition-delay: 140ms;
+}
+
+.lw-street .lw-window {
+  transition-delay: 260ms;
+}
+
+.leaf-world[data-lit="true"] .lw-window {
+  opacity: 0.92;
+}
+
+.lw-glow {
+  opacity: 0;
+  transition: opacity 1100ms ease-out 320ms;
+}
+
+.lw-lamp {
+  fill: #ffd7a1;
+  opacity: 0;
+  transition: opacity 600ms ease-out 380ms;
+}
+
+.leaf-world[data-lit="true"] .lw-glow {
+  opacity: 0.8;
+}
+
+.leaf-world[data-lit="true"] .lw-lamp {
+  opacity: 1;
+}
+
+/* --- atmosphere --- */
+
+.lw-motes {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1400ms ease-out 700ms;
+}
+
+.leaf-world[data-ready="true"] .lw-motes {
+  opacity: 1;
+}
+
+.lw-mote {
+  position: absolute;
+  border-radius: 999px;
+  background: rgb(255 214 166 / 0.8);
+  box-shadow: 0 0 6px rgb(255 171 94 / 0.5);
+  animation-name: lw-mote-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes lw-mote-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.7;
+  }
+  78% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(10px, -40px, 0);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf-world *,
+  .leaf-world *::before,
+  .leaf-world *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .lw-motes {
+    display: none;
+  }
+}
+/* ==================================================================== */
+/* PHASE 6.13 — FIELD ARCHIVE                                           */
+/* ==================================================================== */
+
+.fa {
+  position: relative;
+}
+
+.fa-seam {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fa-seam-rule {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(201 163 95 / 0.32),
+    transparent
+  );
+}
+
+.fa-seam-mark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgb(201 163 95 / 0.72);
+}
+
+.fa-head {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 26px;
+  border-bottom: 1px solid rgb(201 163 95 / 0.15);
+  padding-bottom: 22px;
+}
+
+@media (min-width: 640px) {
+  .fa-head {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 26px;
+  }
+}
+
+.fa-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgb(201 163 95 / 0.7);
+}
+
+.fa-heading-title {
+  margin-top: 12px;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.7rem, 5vw, 2.25rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: rgb(237 231 218);
+}
+
+.fa-head-note {
+  max-width: 20rem;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgb(159 156 148 / 0.6);
+}
+
+.fa-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 30px;
+}
+
+@media (min-width: 640px) {
+  .fa-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fa-grid {
+    gap: 20px;
+  }
+}
+
+.fa-card {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgb(201 163 95 / 0.15);
+  background: rgb(11 15 11 / 0.8);
+  outline-offset: 3px;
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms ease-out,
+    box-shadow 520ms ease-out;
+}
+
+.fa-card:hover,
+.fa-card:focus-visible {
+  transform: translate3d(0, -4px, 0);
+  border-color: rgb(201 163 95 / 0.42);
+  box-shadow: 0 24px 60px -32px rgb(201 163 95 / 0.34);
+}
+
+.fa-card:focus-visible {
+  outline: 1px solid rgb(201 163 95 / 0.7);
+}
+
+.fa-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(201 163 95 / 0.1);
+  background: #121417;
+}
+
+.fa-shot {
+  object-fit: cover;
+  object-position: top;
+  opacity: 0;
+  filter: brightness(0.78) grayscale(0.2);
+  transform: scale(1.06) translate3d(0, 1.5%, 0);
+  transition:
+    transform 950ms cubic-bezier(0.22, 1, 0.36, 1) var(--fa-delay, 0ms),
+    opacity 780ms ease-out var(--fa-delay, 0ms),
+    filter 620ms ease-out;
+}
+
+.fa-card[data-visible="true"] .fa-shot {
+  opacity: 1;
+  transform: none;
+}
+
+.fa-card:hover .fa-shot,
+.fa-card:focus-visible .fa-shot {
+  filter: brightness(0.95) grayscale(0);
+  transform: scale(1.04);
+}
+
+.fa-media-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(7 8 6 / 0.78), transparent 62%);
+  opacity: 0.9;
+  transition: opacity 500ms ease-out;
+}
+
+.fa-card:hover .fa-media-scrim,
+.fa-card:focus-visible .fa-media-scrim {
+  opacity: 0.75;
+}
+
+.fa-open {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  height: 32px;
+  width: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(237 231 218 / 0.16);
+  background: rgb(7 8 6 / 0.72);
+  color: rgb(237 231 218 / 0.9);
+  transition:
+    border-color 320ms ease-out,
+    color 320ms ease-out;
+}
+
+.fa-card:hover .fa-open,
+.fa-card:focus-visible .fa-open {
+  border-color: rgb(201 163 95 / 0.55);
+  color: rgb(232 205 152);
+}
+
+.fa-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 18px 20px 20px;
+}
+
+.fa-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fa-title {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  line-height: 1.12;
+  color: rgb(237 231 218);
+}
+
+/* The title unmasks from below: the mask clips, the text moves. */
+.fa-title-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+
+.fa-title-text {
+  display: inline-block;
+  transform: translate3d(0, 108%, 0);
+  transition: transform 820ms cubic-bezier(0.22, 1, 0.36, 1)
+    calc(var(--fa-delay, 0ms) + 110ms);
+}
+
+.fa-card[data-visible="true"] .fa-title-text {
+  transform: none;
+}
+
+.fa-title-mask::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 7px;
+  background: linear-gradient(90deg, rgb(201 163 95 / 0.62), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1)
+    calc(var(--fa-delay, 0ms) + 260ms);
+}
+
+.fa-card[data-visible="true"] .fa-title-mask::after {
+  transform: scaleX(1);
+}
+
+.fa-index {
+  flex: none;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: rgb(216 212 200 / 0.4);
+}
+
+.fa-index-total {
+  color: rgb(216 212 200 / 0.22);
+}
+
+.fa-description {
+  margin-top: 9px;
+  font-size: 12px;
+  line-height: 1.75;
+  color: rgb(216 212 200 / 0.66);
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition:
+    opacity 700ms ease-out calc(var(--fa-delay, 0ms) + 190ms),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--fa-delay, 0ms) + 190ms);
+}
+
+.fa-card[data-visible="true"] .fa-description {
+  opacity: 1;
+  transform: none;
+}
+
+.fa-stack,
+.fa-link {
+  opacity: 0;
+  transition: opacity 700ms ease-out calc(var(--fa-delay, 0ms) + 280ms);
+}
+
+.fa-card[data-visible="true"] .fa-stack,
+.fa-card[data-visible="true"] .fa-link {
+  opacity: 1;
+}
+
+.fa-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(216 212 200 / 0.46);
+}
+
+.fa-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  border-top: 1px solid rgb(201 163 95 / 0.1);
+  padding-top: 12px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(201 163 95 / 0.68);
+  transition:
+    opacity 700ms ease-out calc(var(--fa-delay, 0ms) + 280ms),
+    color 320ms ease-out;
+}
+
+.fa-card:hover .fa-link,
+.fa-card:focus-visible .fa-link {
+  color: rgb(232 205 152);
+}
+
+.fa-link-arrow {
+  transition: transform 320ms ease-out;
+}
+
+.fa-card:hover .fa-link-arrow,
+.fa-card:focus-visible .fa-link-arrow {
+  transform: translate3d(2px, -2px, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-shot,
+  .fa-title-text,
+  .fa-description,
+  .fa-stack,
+  .fa-link {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .fa-title-mask::after {
+    transform: scaleX(1) !important;
+    transition: none !important;
+  }
+
+  .fa-card:hover,
+  .fa-card:focus-visible {
+    transform: none;
+  }
+}
+
+/* Ambient loops that never stop. They give the encounter life while it is on
+   screen and cost nothing when it is not, so they are gated on the same armed
+   attribute the technique uses. */
+@media (prefers-reduced-motion: no-preference) {
+  .wnd-cue svg,
+  .wtr-vortex,
+  .fyr-spiral {
+    animation: none;
+  }
+
+  .wnd[data-active="true"] .wnd-cue svg {
+    animation: wnd-cue-drift 3.4s ease-in-out infinite;
+  }
+
+  .wtr[data-active="true"] .wtr-vortex {
+    animation: wtr-turn 54s linear infinite;
+  }
+
+  .fyr[data-active="true"] .fyr-spiral {
+    animation: fyr-turn 46s linear infinite;
   }
 }

@@ -147,6 +147,7 @@ export default function ResQGallery() {
   return (
     <div
       ref={rootRef}
+      data-live={inView ? "true" : "false"}
       className="wnd-carousel"
       role="region"
       aria-roledescription="carousel"
@@ -177,7 +178,9 @@ export default function ResQGallery() {
           const distance = Math.abs(offset);
           const depth = Math.min(distance, 1);
           const style = {
-            "--wnd-x": `${offset * 62}%`,
+            // PHASE 6.14 — 46% instead of 62%: the deck now lives in the
+            // right column, so the neighbours peek rather than sit half off it.
+            "--wnd-x": `${offset * 46}%`,
             "--wnd-y": `${depth * 2.4}%`,
             "--wnd-z": `${depth * -190}px`,
             "--wnd-ry": `${offset * -13}deg`,

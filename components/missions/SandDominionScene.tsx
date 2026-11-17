@@ -23,9 +23,11 @@ import { useEncounterActive } from "./useEncounterActive";
  * the origin is represented by the sand aura and rings only. No generic ninja
  * stand-in is rendered.
  *
- * All motion is one-shot CSS driven by `data-active`. Base styles describe the
- * settled composition, so reduced motion and observer failure still show a
- * complete, readable scene. No canvas, no rAF loop, no per-frame state.
+ * All motion is CSS driven by `data-active`, re-armed by `useEncounterActive`
+ * each time the stage enters the reading band (phase 6.13). Base styles describe
+ * the settled composition, so a reset, reduced motion and observer failure all
+ * still show a complete, readable scene. No canvas, no rAF loop, no per-frame
+ * state.
  */
 
 type Mote = {
@@ -106,14 +108,13 @@ export default function SandDominionScene({
   mission: Mission;
   index: number;
 }) {
-  const { ref, active } = useEncounterActive<HTMLElement>(0.06);
+  const { ref, active } = useEncounterActive<HTMLElement>();
   const code = String(index + 1).padStart(2, "0");
   const [classification, discipline] = mission.category.split(" · ");
   const art = SAND_GAARA;
 
   return (
     <article
-      ref={ref}
       data-encounter={mission.id}
       data-jutsu="sand"
       data-active={active ? "true" : "false"}
@@ -121,7 +122,7 @@ export default function SandDominionScene({
       className="bw relative border-t border-gold/10 first:border-t-0"
     >
       {/* ---------------- SCENE A — full-screen sand ---------------- */}
-      <section className="bw-stage" aria-labelledby="bw-title">
+      <section ref={ref} className="bw-stage" aria-labelledby="bw-title">
         <span className="bw-env" aria-hidden="true" />
         <span className="bw-vignette" aria-hidden="true" />
 

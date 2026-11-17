@@ -25,9 +25,19 @@ import { useEncounterActive } from "./useEncounterActive";
  *
  * Authored SVG/CSS on one fixed 1440×900 viewBox plus HTML motes. No canvas, no
  * requestAnimationFrame, no per-frame React state, no scroll listener, no scroll
- * lock. Base styles are the *settled* composition and the timeline is armed once
- * by `useEncounterActive`, so reduced motion and a failed observer still show
- * the complete scene.
+ * lock. Base styles are the *settled* composition and `useEncounterActive`
+ * re-arms the timeline on every entry into the reading band (phase 6.13), so
+ * reduced motion and a failed observer still show the complete scene.
+ *
+ * PHASE 6.14 — the choreography above is unchanged, but it no longer runs one
+ * animation per element. Measurement pinned the entire per-frame cost on this
+ * full-viewport SVG: ~150 independently animated children, most of them
+ * stroke-dashoffset draws, meant the whole layer re-rasterised every frame.
+ * Each layer (`wnd-strata`, `wnd-ribbons`, `wnd-currents`, `wnd-vortex`,
+ * `wnd-spirals`, `wnd-arcs`, `wnd-gusts`, `wnd-formation`, `wnd-travel`,
+ * `wnd-wave-ribs`, `wnd-sprays`, `wnd-release`) now has a single transform and
+ * opacity timeline, and the heaviest four are promoted to their own layer. The
+ * geometry, gradients, timing and staging are untouched.
  */
 
 type Strand = {
@@ -211,20 +221,19 @@ export default function WindReleaseScene({
   mission: Mission;
   index: number;
 }) {
-  const { ref, active } = useEncounterActive<HTMLElement>(0.06);
+  const { ref, active } = useEncounterActive<HTMLElement>();
   const code = String(index + 1).padStart(2, "0");
   const [classification, discipline] = mission.category.split(" · ");
 
   return (
     <article
-      ref={ref}
       data-encounter={mission.id}
       data-jutsu="wind"
       data-active={active ? "true" : "false"}
       className="wnd border-t border-gold/10 first:border-t-0"
     >
       {/* ---------------- A — protective formation ---------------- */}
-      <section className="wnd-stage" aria-labelledby="wnd-title">
+      <section ref={ref} className="wnd-stage" aria-labelledby="wnd-title">
         <span className="wnd-env" aria-hidden="true" />
         <span className="wnd-atmos" aria-hidden="true" />
         <span className="wnd-veil" aria-hidden="true" />
@@ -294,10 +303,6 @@ export default function WindReleaseScene({
                   stroke="url(#wnd-strata)"
                   strokeWidth={strand.width}
                   strokeLinecap="round"
-                  style={{
-                    animationDelay: `${strand.delay}ms`,
-                    animationDuration: `${strand.duration}ms`,
-                  }}
                 />
               ))}
               <g transform="translate(1440 0) scale(-1 1)">
@@ -309,10 +314,6 @@ export default function WindReleaseScene({
                     stroke="url(#wnd-strata)"
                     strokeWidth={strand.width}
                     strokeLinecap="round"
-                    style={{
-                      animationDelay: `${strand.delay + 130}ms`,
-                      animationDuration: `${strand.duration}ms`,
-                    }}
                   />
                 ))}
               </g>
@@ -333,7 +334,6 @@ export default function WindReleaseScene({
                   strokeLinecap="round"
                   strokeDasharray={ring.dash}
                   transform={`rotate(${ring.rotate} 720 450)`}
-                  style={{ animationDelay: `${380 + ringIndex * 140}ms` }}
                 />
               ))}
             </g>
@@ -349,7 +349,6 @@ export default function WindReleaseScene({
                   strokeOpacity={spiral.opacity}
                   strokeWidth={spiral.width}
                   strokeLinecap="round"
-                  style={{ animationDelay: `${460 + spiralIndex * 180}ms` }}
                 />
               ))}
             </g>
@@ -364,10 +363,6 @@ export default function WindReleaseScene({
                   stroke="url(#wnd-ribbon)"
                   strokeWidth={ribbon.width}
                   strokeLinecap="round"
-                  style={{
-                    animationDelay: `${ribbon.delay}ms`,
-                    animationDuration: `${ribbon.duration}ms`,
-                  }}
                 />
               ))}
               <g transform="translate(1440 0) scale(-1 1)">
@@ -379,10 +374,6 @@ export default function WindReleaseScene({
                     stroke="url(#wnd-ribbon)"
                     strokeWidth={ribbon.width}
                     strokeLinecap="round"
-                    style={{
-                      animationDelay: `${ribbon.delay + 90}ms`,
-                      animationDuration: `${ribbon.duration}ms`,
-                    }}
                   />
                 ))}
               </g>
@@ -398,10 +389,6 @@ export default function WindReleaseScene({
                   stroke={`url(#wnd-current-${current.tone})`}
                   strokeWidth={current.width}
                   strokeLinecap="round"
-                  style={{
-                    animationDelay: `${current.delay}ms`,
-                    animationDuration: `${current.duration}ms`,
-                  }}
                 />
               ))}
               <g transform="translate(1440 0) scale(-1 1)">
@@ -413,10 +400,6 @@ export default function WindReleaseScene({
                     stroke={`url(#wnd-current-${current.tone})`}
                     strokeWidth={current.width}
                     strokeLinecap="round"
-                    style={{
-                      animationDelay: `${current.delay + 70}ms`,
-                      animationDuration: `${current.duration}ms`,
-                    }}
                   />
                 ))}
               </g>
@@ -432,7 +415,6 @@ export default function WindReleaseScene({
                   cy="450"
                   r={mote.size}
                   fill="#d6feff"
-                  style={{ animationDelay: `${mote.delay}ms` }}
                 />
               ))}
             </g>
@@ -499,7 +481,6 @@ export default function WindReleaseScene({
                     strokeLinecap="round"
                     strokeDasharray={arc.dash}
                     transform={`rotate(${arc.rotate} 720 450)`}
-                    style={{ animationDelay: `${620 + arcIndex * 90}ms` }}
                   />
                 ))}
               </g>
@@ -509,7 +490,6 @@ export default function WindReleaseScene({
                     key={`gust-${gustIndex}`}
                     transform={`rotate(${gust.angle} 720 450)`}
                     className="wnd-gust"
-                    style={{ animationDelay: `${gust.delay}ms` }}
                   >
                     <path
                       d={`M${720 + gust.radius} 450 L${720 + gust.radius + gust.length} 450`}
@@ -593,31 +573,31 @@ export default function WindReleaseScene({
                 strokeOpacity="0.3"
                 strokeWidth="1"
               />
-              {WAVE_RIBS.map((rib, ribIndex) => (
-                <path
-                  key={`rib-${ribIndex}`}
-                  className="wnd-wave-rib"
-                  d={rib.d}
-                  stroke="url(#wnd-wave-rib)"
-                  strokeWidth={rib.width}
-                  strokeLinecap="round"
-                  style={{ animationDelay: `${rib.delay}ms` }}
-                />
-              ))}
-              {SPRAY.map((drop, dropIndex) => (
-                <circle
-                  key={`spray-${dropIndex}`}
-                  className={`wnd-spray wnd-spray-${drop.variant}`}
-                  cx="720"
-                  cy="450"
-                  r={drop.size}
-                  fill="#d6feff"
-                  style={{
-                    animationDelay: `${drop.delay}ms`,
-                    opacity: drop.opacity,
-                  }}
-                />
-              ))}
+              <g className="wnd-wave-ribs">
+                {WAVE_RIBS.map((rib, ribIndex) => (
+                  <path
+                    key={`rib-${ribIndex}`}
+                    className="wnd-wave-rib"
+                    d={rib.d}
+                    stroke="url(#wnd-wave-rib)"
+                    strokeWidth={rib.width}
+                    strokeLinecap="round"
+                  />
+                ))}
+              </g>
+              <g className="wnd-sprays">
+                {SPRAY.map((drop, dropIndex) => (
+                  <circle
+                    key={`spray-${dropIndex}`}
+                    className="wnd-spray"
+                    cx="720"
+                    cy="450"
+                    r={drop.size}
+                    fill="#d6feff"
+                    opacity={drop.opacity}
+                  />
+                ))}
+              </g>
             </g>
           </svg>
         </div>
@@ -704,27 +684,79 @@ export default function WindReleaseScene({
         id="wnd-gallery"
         aria-labelledby="wnd-gallery-title"
       >
-        <div className="wnd-gallery-inner">
-          <div className="wnd-gallery-head">
-            <div>
-              <p className="wnd-kicker wnd-kicker-teal">
-                <span aria-hidden="true" className="wnd-kicker-line" />
-                Mission intelligence · interface design
-              </p>
-              <h4 id="wnd-gallery-title" className="wnd-gallery-title">
-                Inside the build.
-              </h4>
-            </div>
-            <p className="wnd-gallery-note">
+        {/* PHASE 6.14 — the deck moves to its own column on the right; the
+            reading column takes the left half of the frame. */}
+        <div className="wnd-gallery-inner wnd-gallery-split">
+          <div className="wnd-gallery-copy">
+            <p className="wnd-kicker wnd-kicker-teal">
+              <span aria-hidden="true" className="wnd-kicker-line" />
+              Mission intelligence · interface design
+            </p>
+            <h4 id="wnd-gallery-title" className="wnd-gallery-title">
+              Inside the build.
+            </h4>
+            <p className="wnd-gallery-lede">
               {String(resqScreens.length).padStart(2, "0")} interface designs
               from the ResQ design system — not captures of the release build.
-              The deck advances every two seconds: hover, focus or touch to hold
-              it, or use the controls.
             </p>
+
+            <ul className="wnd-gallery-points">
+              <li>
+                <span aria-hidden="true" className="wnd-gallery-index">
+                  01
+                </span>
+                <div>
+                  <h5>Watches the journey</h5>
+                  <p>
+                    Reads the phone&rsquo;s motion sensors while the device
+                    travels, and only raises its hand when several signals agree
+                    something went wrong.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <span aria-hidden="true" className="wnd-gallery-index">
+                  02
+                </span>
+                <div>
+                  <h5>Asks before it acts</h5>
+                  <p>
+                    A confirmation screen gives the traveller a way to say they
+                    are fine. Nothing is sent while the question is unanswered.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <span aria-hidden="true" className="wnd-gallery-index">
+                  03
+                </span>
+                <div>
+                  <h5>Escalates through the phone</h5>
+                  <p>
+                    If there is no answer, the app asks the device to message the
+                    contacts already saved on it — no account, no server round
+                    trip for the alert itself.
+                  </p>
+                </div>
+              </li>
+            </ul>
+
+            <div className="wnd-gallery-meta">
+              <span className="wnd-gallery-meta-label">Stack</span>
+              <ul>
+                {mission.stack.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <div className="wnd-gallery-float">
             <ResQGallery />
+            <p className="wnd-gallery-hint">
+              The deck advances every two seconds — hover, focus or touch to
+              hold it, or use the controls.
+            </p>
           </div>
         </div>
       </section>

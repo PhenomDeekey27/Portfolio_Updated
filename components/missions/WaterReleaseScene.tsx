@@ -15,7 +15,8 @@ import { useEncounterActive } from "./useEncounterActive";
  *
  * Unlike the sand storm and the wind formation, everything here is horizontal
  * and circular: broad sheets, curved streams, elliptical rings. No canvas, no
- * per-frame React state, no scroll locking and no replay on scroll reversal.
+ * per-frame state, no scroll locking. The current is re-armed by
+ * `useEncounterActive` on every entry, both directions (phase 6.13).
  * The workflow diagram is an explanatory illustration built from the verified
  * engagement, not a mock client interface.
  */
@@ -141,20 +142,19 @@ export default function WaterReleaseScene({
   mission: Mission;
   index: number;
 }) {
-  const { ref, active } = useEncounterActive<HTMLElement>(0.06);
+  const { ref, active } = useEncounterActive<HTMLElement>();
   const code = String(index + 1).padStart(2, "0");
   const [classification, discipline] = mission.category.split(" · ");
 
   return (
     <article
-      ref={ref}
       data-encounter={mission.id}
       data-jutsu="water"
       data-active={active ? "true" : "false"}
       className="wtr border-t border-gold/10 first:border-t-0"
     >
       {/* ---------------- A — the converging current ---------------- */}
-      <section className="wtr-stage" aria-labelledby="wtr-title">
+      <section ref={ref} className="wtr-stage" aria-labelledby="wtr-title">
         <span className="wtr-env" aria-hidden="true" />
         <span className="wtr-veil" aria-hidden="true" />
 

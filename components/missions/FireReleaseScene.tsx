@@ -126,20 +126,19 @@ export default function FireReleaseScene({
   mission: Mission;
   index: number;
 }) {
-  const { ref, active } = useEncounterActive<HTMLElement>(0.06);
+  const { ref, active } = useEncounterActive<HTMLElement>();
   const code = String(index + 1).padStart(2, "0");
   const [classification, discipline] = mission.category.split(" · ");
 
   return (
     <article
-      ref={ref}
       data-encounter={mission.id}
       data-jutsu="fire"
       data-active={active ? "true" : "false"}
       className="fyr border-t border-gold/10 first:border-t-0"
     >
       {/* ---------------- A — the ignition ---------------- */}
-      <section className="fyr-stage" aria-labelledby="fyr-title">
+      <section ref={ref} className="fyr-stage" aria-labelledby="fyr-title">
         <span className="fyr-env" aria-hidden="true" />
         <span className="fyr-veil" aria-hidden="true" />
 
