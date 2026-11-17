@@ -27,6 +27,8 @@ export const skillCategories: SkillCategory[] = [
       "Next.js",
       "TypeScript",
       "JavaScript",
+      "Tailwind CSS",
+      "Kotlin (Android)",
       "Node.js",
       "Express.js",
       "REST APIs",

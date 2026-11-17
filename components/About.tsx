@@ -46,7 +46,7 @@ export default function About() {
         </Reveal>
         <Reveal delay={STAGGER.heading}>
           <h2 className="mt-5 max-w-3xl font-display text-4xl leading-[1.05] font-light tracking-tight text-[#f5efe2] sm:text-5xl lg:text-6xl [text-shadow:0_2px_28px_rgba(0,0,0,0.9)]">
-            A full-stack developer shaped by shipped work, client systems and the space where applications meet AI.
+            An AI-focused full-stack software developer shaped by shipped work, client systems and the space where applications meet AI.
           </h2>
         </Reveal>
         <Reveal delay={STAGGER.intro}>
@@ -59,7 +59,7 @@ export default function About() {
           <Reveal className="lg:col-span-7" delay={STAGGER.journey}>
             <div className="border-l-2 border-gold/35 pl-6 sm:pl-7">
               <div className="space-y-6 text-[15px] leading-8 text-[#d6cfbe] [text-shadow:0_1px_14px_rgba(0,0,0,0.75)] sm:text-base">
-                <p>I&apos;m an AI-focused full-stack developer with over two years of experience building applications across product teams and client platforms. I work end to end: the interface someone uses, the API behind it, the data it depends on, and the model or workflow that makes it smarter.</p>
+                <p>I&apos;m an AI-focused full-stack software developer with over two years of experience building applications across product teams and client platforms. I work end to end: the interface someone uses, the API behind it, the data it depends on, and the model or workflow that makes it smarter.</p>
                 <p>That path has run from MERN product features to enterprise no-code tooling, FastAPI services, CRM integrations and AI-powered automation. I enjoy the connective tissue of a product: the API contract, the edge case, the workflow that quietly saves someone an hour.</p>
                 <p>More recently I&apos;ve been building with LLMs, retrieval and MCP tools, and wiring email, WhatsApp, Telegram and voice-agent channels into real business workflows. I care about honest systems, clear interfaces and code that is easier to change than it was to write.</p>
               </div>

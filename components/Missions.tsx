@@ -65,7 +65,7 @@ export default function Missions() {
                 {String(missions.length).padStart(2, "0")} mission records
               </div>
               <p className="mt-1.5 pl-7 font-mono text-[8px] uppercase tracking-[0.18em] text-ash/45">
-                02 client · 02 personal
+                02 hackathon · 02 client
               </p>
             </div>
           </Reveal>

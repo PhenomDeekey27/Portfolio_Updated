@@ -237,15 +237,45 @@ export default function ResQRecord({
             <div className="wnd-record-close-main">
               <p className="wnd-chapter-body">
                 ResQ is an Android application, so there is no live web build to
-                open. The source repository and the signed release page are the
-                verified entry points.
+                open. Its nearby-resource service is a separate FastAPI
+                repository deployed on its own, and the app talks to that
+                service at runtime. The Android source repository and the signed
+                release page are the verified entry points for the client.
               </p>
 
-              <ul className="wnd-stack" aria-label="Technology stack">
-                {mission.stack.map((item) => (
-                  <li key={item}>{item}</li>
+              <div role="group" aria-label="Technology stack by layer">
+                {(mission.stackGroups ?? [
+                  { label: "Stack", items: mission.stack },
+                ]).map((group) => (
+                  <div key={group.label} className="mt-4 first:mt-0">
+                    <p className="wnd-chapter-label">{group.label}</p>
+                    <ul
+                      className="wnd-stack"
+                      style={{ marginTop: 8 }}
+                      aria-label={`${group.label} technologies`}
+                    >
+                      {group.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+
+                {mission.integrations?.length ? (
+                  <div className="mt-4">
+                    <p className="wnd-chapter-label">Integrations</p>
+                    <ul
+                      className="wnd-stack"
+                      style={{ marginTop: 8 }}
+                      aria-label="External integrations"
+                    >
+                      {mission.integrations.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
 
               <div className="wnd-links">
                 {mission.links.github ? (

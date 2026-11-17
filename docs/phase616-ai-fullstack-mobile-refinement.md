@@ -204,9 +204,10 @@ implementation → 03 interfaces, stack and links**.
 
 **BugWiser** went from four sections (what it is, three audience profiles, six features,
 access) to three, with the audience profiles folded into one sentence of the stage copy and
-six features condensed to the five the deployed build implements. Repository, live build,
-the “patches are generated for review, never applied automatically” boundary and the
-hackathon association are preserved.
+six features condensed to the five the deployed build implements. Repository, live build
+and the hackathon association are preserved. (Phase 6.17 corrected one claim here: the
+build does apply a patch to a new fix branch and open a pull request, with the default
+branch untouched.)
 
 **ResQ** went from six technical chapters with two to three paragraphs each to three
 sections. The implementation detail that was cut — sample windows, countdown lengths,

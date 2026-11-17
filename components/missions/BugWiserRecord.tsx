@@ -27,7 +27,7 @@ const FEATURES = [
   {
     icon: FaGithub,
     title: "Repository analysis",
-    body: "Connects through a GitHub App installation, so the investigation runs against the real repository rather than a pasted snippet.",
+    body: "Connects with GitHub OAuth, so the investigation runs against a repository the developer already has access to rather than a pasted snippet.",
   },
   {
     icon: Search,
@@ -47,7 +47,7 @@ const FEATURES = [
   {
     icon: GitPullRequest,
     title: "Branch and pull request",
-    body: "Carries an accepted patch into a fix branch and pull request, so the fix still goes through normal review.",
+    body: "Applies an accepted patch to a new fix branch and opens a pull request, so the fix still goes through normal review.",
   },
 ];
 
@@ -172,16 +172,48 @@ export default function BugWiserRecord({
                 </h5>
               </div>
               <p className="bw-access-note">
-                The stack comes from the project record. Both links open the
-                verified public work in a new tab.
+                Stack verified against the repository manifest and README. Both
+                links open the verified public work in a new tab.
               </p>
             </div>
 
-            <ul className="bw-access-stack" aria-label="Technology stack">
-              {mission.stack.map((item) => (
-                <li key={item}>{item}</li>
+            <div
+              className="mt-6 space-y-4"
+              role="group"
+              aria-label="Technology stack by layer"
+            >
+              {(mission.stackGroups ?? [
+                { label: "Stack", items: mission.stack },
+              ]).map((group) => (
+                <div key={group.label}>
+                  <p className="bw-story-label">{group.label}</p>
+                  <ul
+                    className="bw-access-stack"
+                    style={{ marginTop: 10 }}
+                    aria-label={`${group.label} technologies`}
+                  >
+                    {group.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
+
+            {mission.integrations?.length ? (
+              <div className="mt-5">
+                <p className="bw-story-label">Integrations</p>
+                <ul
+                  className="bw-access-stack"
+                  style={{ marginTop: 10 }}
+                  aria-label="External integrations"
+                >
+                  {mission.integrations.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             <div className="bw-access-links">
               {mission.links.github ? (
@@ -231,8 +263,8 @@ export default function BugWiserRecord({
 
             <p className="bw-record-source">
               Screens captured from the deployed build; repository and live link
-              verified. Patches are generated for review, never applied
-              automatically.
+              verified. An accepted patch is applied to a new fix branch and
+              opened as a pull request; the default branch is never modified.
             </p>
           </section>
         </Reveal>
