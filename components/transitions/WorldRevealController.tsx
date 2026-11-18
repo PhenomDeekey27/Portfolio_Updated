@@ -200,7 +200,10 @@ export function WorldRevealController({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={skipIntro}
-          className="fixed bottom-6 right-6 z-[101] font-mono text-[9px] uppercase tracking-[0.3em] text-ash/60 hover:text-gold-soft transition-colors"
+          /* PHASE 6.18 — the phone copy no longer waits on the sequence, so there
+             is nothing to skip there; the control only sat on top of the
+             portrait. Hidden below 1024px. */
+          className="skip-intro fixed bottom-6 right-6 z-[101] font-mono text-[9px] uppercase tracking-[0.3em] text-ash/60 hover:text-gold-soft transition-colors"
         >
           Skip intro
         </button>

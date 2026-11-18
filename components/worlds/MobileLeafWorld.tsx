@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useReveal,
   type RevealPhase,
@@ -126,6 +126,22 @@ function HouseShape({
 export default function MobileLeafWorld() {
   const { phase, markSceneReady } = useReveal();
   const [reduced, setReduced] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
+
+  // PHASE 6.18 — the six motes used to drift for the life of the document,
+  // long after the Home section scrolled away. One observer pauses them when
+  // the world is off screen; nothing else here loops.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => setVisible(entries[entries.length - 1]?.isIntersecting ?? false),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // There is no WebGL scene on this path to report readiness. PHASE 6.16: the
   // controller starts the compact sequence on mount, so this is only a fallback
@@ -150,8 +166,10 @@ export default function MobileLeafWorld() {
 
   return (
     <div
+      ref={rootRef}
       aria-hidden="true"
       className="leaf-world"
+      data-visible={visible ? "true" : "false"}
       data-ready={on(1)}
       data-mountains={on(2)}
       data-terrain={on(3)}

@@ -163,9 +163,20 @@ export const missions: Mission[] = [
       "Payment reminders",
       "Google Drive document automation",
     ],
-    // Core technologies only. The channels it talks to are integrations, not stack.
-    stack: ["Next.js", "Python", "FastAPI", "Zoho CRM"],
-    integrations: ["WhatsApp", "Telegram", "Email", "Google Drive"],
+    // Core technologies only. Zoho CRM and the messaging channels are
+    // integrations, not stack (PHASE 6.18).
+    stack: ["Next.js", "React", "Python", "FastAPI"],
+    stackGroups: [
+      { label: "Frontend", items: ["Next.js", "React"] },
+      { label: "Backend", items: ["Python", "FastAPI"] },
+    ],
+    integrations: [
+      "Zoho CRM",
+      "WhatsApp",
+      "Telegram",
+      "Email",
+      "Google Drive",
+    ],
     links: {},
     note: "Delivered as part of professional client work. The platform is client-owned.",
     client: true,
@@ -192,6 +203,13 @@ export const missions: Mission[] = [
     // Next.js/TypeScript/Python/FastAPI/Tailwind are the build; voice and
     // messaging services are integrations (see `integrations`).
     stack: ["Next.js", "TypeScript", "Python", "FastAPI", "Tailwind CSS"],
+    stackGroups: [
+      {
+        label: "Frontend",
+        items: ["Next.js", "TypeScript", "Tailwind CSS"],
+      },
+      { label: "Backend", items: ["Python", "FastAPI"] },
+    ],
     integrations: ["Vapi", "Bolna", "WhatsApp", "Email"],
     links: {},
     note: "Delivered as part of professional client work. The platform is client-owned.",

@@ -22,8 +22,11 @@ export default function About() {
   const worldVisible = phase !== "pending";
   const textVisible = phase === "content";
 
+  // PHASE 6.18 — the section's top padding is CSS (`#about` in globals.css) so
+  // it can be derived from the phone environment band's own height instead of a
+  // viewport share that never matched it.
   return (
-    <section id="about" data-about-section className="relative overflow-clip border-b border-bone/10 bg-[#070809] pt-[48svh] pb-24 sm:pt-[58svh] sm:pb-32 lg:pt-[62svh]">
+    <section id="about" data-about-section className="relative overflow-clip border-b border-bone/10 bg-[#070809] pb-24 sm:pb-32">
       <AboutWorld revealed={worldVisible} />
 
       <SectionContent

@@ -747,8 +747,15 @@ export default function WindReleaseScene({
       >
         {/* PHASE 6.14 — the deck moves to its own column on the right; the
             reading column takes the left half of the frame. */}
+        {/* PHASE 6.18 — the deck comes before the detail copy on a phone.
+            Previously the heading, the lede and three explainer paragraphs all
+            sat above the deck, so the first screenshot did not start until well
+            into the gallery and the visual evidence was pushed off the screen
+            by prose. The intro, the deck and the detail are now separate grid
+            items: phones read heading → screenshots → explanation, desktop
+            keeps the two-column composition (areas in globals.css). */}
         <div className="wnd-gallery-inner wnd-gallery-split">
-          <div className="wnd-gallery-copy">
+          <div className="wnd-gallery-intro">
             <p className="wnd-kicker wnd-kicker-teal">
               <span aria-hidden="true" className="wnd-kicker-line" />
               Mission intelligence · interface design
@@ -760,7 +767,17 @@ export default function WindReleaseScene({
               {String(resqScreens.length).padStart(2, "0")} interface designs
               from the ResQ design system — not captures of the release build.
             </p>
+          </div>
 
+          <div className="wnd-gallery-float">
+            <ResQGallery />
+            <p className="wnd-gallery-hint">
+              The deck advances every two seconds — hover, focus or touch to
+              hold it, or use the controls.
+            </p>
+          </div>
+
+          <div className="wnd-gallery-detail">
             <ul className="wnd-gallery-points">
               <li>
                 <span aria-hidden="true" className="wnd-gallery-index">
@@ -803,21 +820,23 @@ export default function WindReleaseScene({
             </ul>
 
             <div className="wnd-gallery-meta">
-              <span className="wnd-gallery-meta-label">Stack</span>
+              <span className="wnd-gallery-meta-label">Technology</span>
               <ul>
                 {mission.stack.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
+              {mission.integrations?.length ? (
+                <>
+                  <span className="wnd-gallery-meta-label">Integrations</span>
+                  <ul aria-label="External integrations">
+                    {mission.integrations.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
             </div>
-          </div>
-
-          <div className="wnd-gallery-float">
-            <ResQGallery />
-            <p className="wnd-gallery-hint">
-              The deck advances every two seconds — hover, focus or touch to
-              hold it, or use the controls.
-            </p>
           </div>
         </div>
       </section>

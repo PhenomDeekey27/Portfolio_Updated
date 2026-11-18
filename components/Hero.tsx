@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowRight, FileText } from "lucide-react";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
 import KunaiMark from "./motifs/KunaiMark";
@@ -10,19 +11,70 @@ import HiddenLeafStage from "./worlds/HiddenLeafStage";
 import { useReveal } from "@/components/transitions/WorldRevealController";
 import { profile } from "@/lib/data/profile";
 
+/** Media queries resolved after mount, so SSR markup stays deterministic. */
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const update = () => setMatches(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [query]);
+
+  return matches;
+}
+
+/**
+ * PHASE 6.18 — the copy leads on a phone.
+ *
+ * Above 1024px the record still arrives on its own phase (`HERO_TEXT_REVEAL`),
+ * after the village has been built: that is the desktop composition and it is
+ * unchanged.
+ *
+ * On a phone the same phase arrived ~3.4s in, and only then did a single block
+ * of copy fade up — so the visitor watched a background settle before learning
+ * whose portfolio it was. The phone now releases the copy as soon as the
+ * construction sequence starts (`phase !== "LOADING"`), and the village keeps
+ * building, lighting and settling behind it. The hierarchy is carried by the
+ * staggered delays instead of by waiting: name, then role, then introduction,
+ * then the calls to action, each within a second of the first frame.
+ *
+ * Reduced motion collapses every delay to zero and the whole record is simply
+ * there.
+ */
 export default function Hero() {
   const { phase } = useReveal();
-  const contentVisible =
-    phase === "HERO_TEXT_REVEAL" ||
-    phase === "PORTRAIT_REVEAL" ||
-    phase === "CTA_REVEAL" ||
-    phase === "COMPLETE";
+  const compact = useMediaQuery("(max-width: 1023px)");
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+
+  // PHASE 6.18 — one owner per property. These elements used to carry BOTH the
+  // `.hero-rise` mount animation and an inline phase transition on opacity, and
+  // a CSS animation outranks an inline style: by the time the copy was released
+  // the rise had already finished, so the record arrived as a single block with
+  // no hierarchy. The phase-gated items below keep only the inline transition;
+  // the kicker and the footer row, which are not phase-gated, keep `.hero-rise`.
+  const started = phase !== "LOADING";
+  const contentVisible = compact
+    ? started
+    : phase === "HERO_TEXT_REVEAL" ||
+      phase === "PORTRAIT_REVEAL" ||
+      phase === "CTA_REVEAL" ||
+      phase === "COMPLETE";
   const metadataVisible = contentVisible;
-  const portraitVisible =
-    phase === "PORTRAIT_REVEAL" ||
-    phase === "CTA_REVEAL" ||
-    phase === "COMPLETE";
-  const ctaVisible = phase === "CTA_REVEAL" || phase === "COMPLETE";
+  const portraitVisible = compact
+    ? started
+    : phase === "PORTRAIT_REVEAL" ||
+      phase === "CTA_REVEAL" ||
+      phase === "COMPLETE";
+  const ctaVisible = compact
+    ? started
+    : phase === "CTA_REVEAL" || phase === "COMPLETE";
+
+  /** Phone delays are tighter than the desktop ones; reduced motion has none. */
+  const delay = (desktopMs: number, phoneMs: number) =>
+    reducedMotion ? "0ms" : `${compact ? phoneMs : desktopMs}ms`;
 
   return (
     <section
@@ -67,11 +119,11 @@ export default function Hero() {
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-7">
             <div
-              className="hero-rise flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[9px] uppercase tracking-[0.3em] text-ash/70 sm:text-[10px] transition-all duration-700 ease-out"
+              className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[9px] uppercase tracking-[0.3em] text-ash/70 sm:text-[10px] transition-all duration-700 ease-out"
               style={{
                 opacity: metadataVisible ? 1 : 0,
                 transform: metadataVisible ? "translateY(0)" : "translateY(-0.6rem)",
-                transitionDelay: "100ms",
+                transitionDelay: delay(100, 60),
               }}
             >
               <span className="inline-flex items-center gap-2 text-gold-soft">
@@ -100,7 +152,9 @@ export default function Hero() {
                       transform: contentVisible
                         ? "translateY(0)"
                         : "translateY(1.2rem)",
-                      transitionDelay: `${i * 35}ms`,
+                      transitionDelay: reducedMotion
+                        ? "0ms"
+                        : `${i * (compact ? 22 : 35)}ms`,
                     }}
                   >
                     {ch}
@@ -117,7 +171,9 @@ export default function Hero() {
                       transform: contentVisible
                         ? "translateY(0)"
                         : "translateY(1.2rem)",
-                      transitionDelay: `${(i + 8) * 35}ms`,
+                      transitionDelay: reducedMotion
+                        ? "0ms"
+                        : `${(i + 8) * (compact ? 22 : 35)}ms`,
                     }}
                   >
                     {ch}
@@ -127,11 +183,11 @@ export default function Hero() {
             </h1>
 
             <div
-              className="hero-rise hero-rise-3 mt-7 flex items-center gap-4 transition-all duration-700 ease-out"
+              className="mt-7 flex items-center gap-4 transition-all duration-700 ease-out"
               style={{
                 opacity: contentVisible ? 1 : 0,
                 transform: contentVisible ? "translateY(0)" : "translateY(0.8rem)",
-                transitionDelay: "700ms",
+                transitionDelay: delay(700, 420),
               }}
             >
               <span aria-hidden="true" className="h-px w-12 bg-gold/60" />
@@ -145,7 +201,9 @@ export default function Hero() {
                       transform: contentVisible
                         ? "translateY(0)"
                         : "translateY(0.6rem)",
-                      transitionDelay: `${1000 + i * 120}ms`,
+                      transitionDelay: reducedMotion
+                        ? "0ms"
+                        : `${(compact ? 420 : 1000) + i * (compact ? 70 : 120)}ms`,
                     }}
                   >
                     {word}
@@ -155,22 +213,22 @@ export default function Hero() {
             </div>
 
             <p
-              className="hero-rise hero-rise-4 mt-7 max-w-xl text-base leading-8 text-ash sm:text-lg transition-all duration-700 ease-out"
+              className="mt-7 max-w-xl text-base leading-8 text-ash sm:text-lg transition-all duration-700 ease-out"
               style={{
                 opacity: contentVisible ? 1 : 0,
                 transform: contentVisible ? "translateY(0)" : "translateY(0.8rem)",
-                transitionDelay: "1000ms",
+                transitionDelay: delay(1000, 560),
               }}
             >
               {profile.intro}
             </p>
 
             <div
-              className="hero-rise hero-rise-5 mt-9 flex flex-col gap-3 sm:flex-row sm:items-center transition-all duration-700 ease-out"
+              className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center transition-all duration-700 ease-out"
               style={{
                 opacity: ctaVisible ? 1 : 0,
                 transform: ctaVisible ? "translateY(0)" : "translateY(0.8rem)",
-                transitionDelay: "200ms",
+                transitionDelay: delay(200, 840),
                 pointerEvents: ctaVisible ? "auto" : "none",
               }}
             >
@@ -229,13 +287,14 @@ export default function Hero() {
 
           {/* Editorial portrait composition */}
           <div
-            className="hero-rise hero-rise-4 relative mx-auto w-full max-w-[22rem] sm:max-w-[26rem] lg:col-span-5 lg:max-w-none transition-all duration-1000 ease-out"
+            className="relative mx-auto w-full max-w-[22rem] sm:max-w-[26rem] lg:col-span-5 lg:max-w-none transition-all duration-1000 ease-out"
             style={{
               opacity: portraitVisible ? 1 : 0,
               transform: portraitVisible ? "translateY(0)" : "translateY(1.5rem)",
               clipPath: portraitVisible
                 ? "inset(0 0 0% 0)"
                 : "inset(0 0 100% 0)",
+              transitionDelay: delay(0, 640),
             }}
           >
             <div className="relative mx-auto aspect-[3/4] w-[82%] sm:w-[76%] lg:w-[84%]">
