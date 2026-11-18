@@ -499,8 +499,10 @@ export default function WaterReleaseScene({
               </ul>
             </Reveal>
 
+            {/* PHASE 6.18 — build and integrations are separate columns, so a
+                CRM and a messaging channel are never read as a framework. */}
             <Reveal className="wtr-panel" delay={140}>
-              <p className="wtr-panel-label">Stack</p>
+              <p className="wtr-panel-label">Technology</p>
               <ul className="wtr-stack">
                 {mission.stack.map((item) => (
                   <li key={item}>{item}</li>
@@ -512,7 +514,21 @@ export default function WaterReleaseScene({
               </p>
             </Reveal>
 
-            <Reveal className="wtr-panel wtr-panel-quiet" delay={200}>
+            {mission.integrations?.length ? (
+              <Reveal className="wtr-panel" delay={170}>
+                <p className="wtr-panel-label">Integrations</p>
+                <ul className="wtr-stack" aria-label="External integrations">
+                  {mission.integrations.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <p className="wtr-panel-note">
+                  Services this platform talks to, configured per deployment.
+                </p>
+              </Reveal>
+            ) : null}
+
+            <Reveal className="wtr-panel wtr-panel-quiet wtr-panel-wide" delay={200}>
               <p className="wtr-panel-label">What this record does not claim</p>
               <p className="wtr-panel-body">
                 No conversion rates, response times, customer counts or revenue

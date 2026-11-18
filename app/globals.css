@@ -6265,24 +6265,45 @@ p {
 .wnd-gallery-split {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: clamp(2rem, 4vw, 3rem);
-  align-items: center;
+  gap: clamp(1.6rem, 4vw, 2.4rem);
+  align-items: start;
+}
+
+/* PHASE 6.18 — phones read heading → deck → detail (source order), so the
+   screenshots are not pushed down by three explainer paragraphs. Desktop keeps
+   the two-column composition through grid areas. */
+.wnd-gallery-float {
+  margin-top: 0;
+}
+
+.wnd-gallery-detail {
+  margin-top: 0;
 }
 
 @media (min-width: 1024px) {
   .wnd-gallery-split {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    gap: clamp(2.5rem, 4vw, 4rem);
+    grid-template-areas:
+      "intro float"
+      "detail float";
+    column-gap: clamp(2.5rem, 4vw, 4rem);
+    row-gap: clamp(1.5rem, 3vw, 2.5rem);
     /* Top-aligned: the reading column starts where the deck starts instead of
        floating half way down beside it. */
     align-items: start;
   }
 
-  .wnd-gallery-copy {
+  .wnd-gallery-intro {
+    grid-area: intro;
     padding-top: clamp(0.5rem, 5vh, 3.5rem);
   }
 
+  .wnd-gallery-detail {
+    grid-area: detail;
+  }
+
   .wnd-gallery-float {
+    grid-area: float;
     margin-top: 0;
   }
 
@@ -7425,13 +7446,6 @@ p {
 
   .wnd-carousel-label-main {
     font-size: 1.02rem;
-  }
-
-  .wnd-chapter-screens,
-  .wnd-chapter-screens.is-pair {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    max-width: none;
   }
 
   .wnd-links {
@@ -10360,14 +10374,174 @@ p {
   }
 }
 /* ==================================================================== */
-/* PHASE 6.13 — FIELD ARCHIVE                                           */
+/* PHASE 6.18 — FIELD ARCHIVE: THE BARRIER VAULT                        */
 /* ==================================================================== */
+
+/*
+ * Four earlier builds held behind a defensive chakra barrier.
+ *
+ * The environment is painted once (dome gradient, three counter-rotating conic
+ * rings, a lattice, a scan line) and moved only with transforms, so the ambient
+ * loop is composited instead of re-rastered. Every ambient timeline is gated on
+ * `[data-inview="true"]`, so nothing runs while the archive is off screen, and
+ * all of it is inside `prefers-reduced-motion: no-preference`.
+ *
+ * The records themselves are mission seals on the left and one revealed record
+ * on the right (2×2 seals above the record on a phone). Choosing a seal replays
+ * the unmasking: the frame opens out of a closed clip, a light sweep crosses it,
+ * then the name, description, verified stack and live link follow.
+ */
 
 .fa {
   position: relative;
+  isolation: isolate;
+  border-top: 1px solid rgb(201 163 95 / 0.12);
+  padding-block: clamp(2.5rem, 5vw, 3.5rem) clamp(1rem, 2vw, 1.5rem);
 }
 
+.fa-env {
+  position: absolute;
+  left: 50%;
+  top: -4%;
+  bottom: 0;
+  z-index: 0;
+  width: 100vw;
+  transform: translateX(-50%);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fa-dome {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(168vw, 1180px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(
+      circle at 50% 46%,
+      rgb(74 222 190 / 0.1) 0%,
+      rgb(56 189 160 / 0.05) 34%,
+      rgb(12 32 28 / 0.16) 58%,
+      transparent 72%
+    );
+}
+
+.fa-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.8;
+  transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg 11deg,
+    rgb(134 239 199 / 0.24) 11deg 12deg,
+    transparent 12deg 24deg,
+    rgb(201 163 95 / 0.16) 24deg 25deg,
+    transparent 25deg 41deg
+  );
+  -webkit-mask-image: radial-gradient(closest-side, transparent 68%, #000 74%, rgb(0 0 0 / 0.6) 86%, transparent 98%);
+  mask-image: radial-gradient(closest-side, transparent 68%, #000 74%, rgb(0 0 0 / 0.6) 86%, transparent 98%);
+}
+
+.fa-ring-a {
+  width: min(124vw, 900px);
+}
+
+.fa-ring-b {
+  width: min(96vw, 700px);
+  opacity: 0.46;
+  -webkit-mask-image: radial-gradient(closest-side, transparent 74%, #000 80%, transparent 96%);
+  mask-image: radial-gradient(closest-side, transparent 74%, #000 80%, transparent 96%);
+}
+
+.fa-ring-c {
+  width: min(70vw, 520px);
+  opacity: 0.38;
+  -webkit-mask-image: radial-gradient(closest-side, transparent 80%, #000 86%, transparent 98%);
+  mask-image: radial-gradient(closest-side, transparent 80%, #000 86%, transparent 98%);
+}
+
+/* The barrier membrane: a faint lattice that reads as chakra structure. */
+.fa-lattice {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    repeating-linear-gradient(60deg, rgb(134 239 199 / 0.1) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(120deg, rgb(134 239 199 / 0.08) 0 1px, transparent 1px 46px);
+  -webkit-mask-image: radial-gradient(70% 74% at 50% 42%, #000 0%, rgb(0 0 0 / 0.4) 56%, transparent 84%);
+  mask-image: radial-gradient(70% 74% at 50% 42%, #000 0%, rgb(0 0 0 / 0.4) 56%, transparent 84%);
+}
+
+.fa-scan {
+  position: absolute;
+  inset-inline: 0;
+  top: 8%;
+  height: 34%;
+  opacity: 0.5;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(94 234 212 / 0.06) 42%,
+    rgb(165 243 252 / 0.16) 50%,
+    rgb(94 234 212 / 0.05) 58%,
+    transparent 100%
+  );
+  transform: translate3d(0, -18%, 0);
+}
+
+/* The archive sits over the mission HQ plate, which is warm and bright. This
+   scrim is what makes the vault read as a darker chamber and keeps the header
+   copy legible without touching the shared Missions world. */
+.fa-env::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(5 7 6 / 0.86) 0%,
+    rgb(5 7 6 / 0.62) 26%,
+    rgb(5 7 6 / 0.34) 56%,
+    rgb(5 7 6 / 0.68) 100%
+  );
+}
+
+/* The barrier itself sits above that scrim, otherwise it disappears into the
+   dark and the archive reads as a plain list again. */
+.fa-dome,
+.fa-ring,
+.fa-lattice,
+.fa-scan {
+  z-index: 1;
+}
+
+.fa-embers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.fa-ember {
+  position: absolute;
+  display: block;
+  width: var(--fa-ember-size, 2px);
+  height: var(--fa-ember-size, 2px);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(209 250 229 / 0.95), rgb(45 212 191 / 0.4) 62%, transparent);
+  opacity: 0;
+}
+
+/* ---------------- seam, heading ---------------- */
+
 .fa-seam {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -10376,12 +10550,7 @@ p {
 .fa-seam-rule {
   height: 1px;
   flex: 1;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgb(201 163 95 / 0.32),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgb(201 163 95 / 0.32), transparent);
 }
 
 .fa-seam-mark {
@@ -10397,6 +10566,8 @@ p {
 }
 
 .fa-head {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -10435,287 +10606,492 @@ p {
 }
 
 .fa-head-note {
-  max-width: 20rem;
+  max-width: 21rem;
   font-size: 12px;
   line-height: 1.7;
-  color: rgb(159 156 148 / 0.6);
+  color: rgb(206 201 190 / 0.72);
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.85);
 }
 
-.fa-grid {
+/* ---------------- vault ---------------- */
+
+.fa-vault {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 16px;
-  margin-top: 30px;
+  margin-top: 26px;
 }
 
-@media (min-width: 640px) {
-  .fa-grid {
+@media (min-width: 1024px) {
+  .fa-vault {
+    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+    gap: 26px;
+    align-items: start;
+    margin-top: 32px;
+  }
+}
+
+/* ---------------- the seals ---------------- */
+
+/* A single column below 640px: at 320 wide a two-up tile leaves ~75px for the
+   name, and "PhenomCommerce" cannot fit without breaking mid-word. One seal per
+   row reads as a mission index and leaves the full width for the name. */
+.fa-seals {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .fa-seals {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+    gap: 9px;
   }
 }
 
 @media (min-width: 1024px) {
-  .fa-grid {
-    gap: 20px;
+  .fa-seals {
+    gap: 10px;
   }
 }
 
-.fa-card {
+.fa-seal {
   position: relative;
   display: flex;
-  height: 100%;
-  flex-direction: column;
+  min-height: 56px;
+  align-items: center;
+  gap: 11px;
   overflow: hidden;
-  border: 1px solid rgb(201 163 95 / 0.15);
-  background: rgb(11 15 11 / 0.8);
-  outline-offset: 3px;
+  border: 1px solid rgb(201 163 95 / 0.18);
+  background: rgb(8 13 11 / 0.72);
+  padding: 11px 12px;
+  text-align: left;
   transition:
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 420ms ease-out,
-    box-shadow 520ms ease-out;
+    border-color 380ms ease-out,
+    background 380ms ease-out,
+    transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.fa-card:hover,
-.fa-card:focus-visible {
-  transform: translate3d(0, -4px, 0);
-  border-color: rgb(201 163 95 / 0.42);
-  box-shadow: 0 24px 60px -32px rgb(201 163 95 / 0.34);
+.fa-seal::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(134 239 199 / 0.55), rgb(201 163 95 / 0.4), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.fa-card:focus-visible {
+.fa-seal:hover::after,
+.fa-seal:focus-visible::after,
+.fa-seal[data-selected="true"]::after {
+  transform: scaleX(1);
+}
+
+.fa-seal:hover,
+.fa-seal:focus-visible {
+  border-color: rgb(134 239 199 / 0.38);
+  background: rgb(11 20 17 / 0.86);
+}
+
+.fa-seal:focus-visible {
   outline: 1px solid rgb(201 163 95 / 0.7);
+  outline-offset: 2px;
 }
 
-.fa-media {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  width: 100%;
+.fa-seal[data-selected="true"] {
+  border-color: rgb(201 163 95 / 0.5);
+  background:
+    linear-gradient(100deg, rgb(201 163 95 / 0.16), rgb(8 13 11 / 0.9) 58%),
+    rgb(8 13 11 / 0.9);
+  box-shadow: 0 18px 44px -30px rgb(201 163 95 / 0.5);
+}
+
+.fa-seal-sigil {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgb(201 163 95 / 0.32);
+  background: rgb(6 10 9 / 0.7);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: rgb(232 205 152 / 0.9);
+  transition: border-color 380ms ease-out, color 380ms ease-out;
+}
+
+.fa-seal[data-selected="true"] .fa-seal-sigil {
+  border-color: rgb(134 239 199 / 0.6);
+  color: rgb(209 250 229 / 0.95);
+}
+
+.fa-seal-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fa-seal-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: rgb(237 231 218);
+  /* Fallback only: the seal is one column wide on a phone, so this should
+     never fire. */
+  overflow-wrap: break-word;
+}
+
+.fa-seal-meta {
+  display: block;
   overflow: hidden;
-  border-bottom: 1px solid rgb(201 163 95 / 0.1);
-  background: #121417;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(216 212 200 / 0.42);
+}
+
+.fa-seal-state {
+  display: none;
+  margin-left: auto;
+  flex: none;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 7px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(201 163 95 / 0.62);
+}
+
+.fa-seal[data-selected="true"] .fa-seal-state {
+  color: rgb(134 239 199 / 0.85);
+}
+
+@media (min-width: 1024px) {
+  .fa-seal-state {
+    display: block;
+  }
+
+  .fa-seal {
+    padding: 13px 15px;
+  }
+
+  .fa-seal-name {
+    font-size: 1.08rem;
+  }
+}
+
+/* ---------------- the revealed record ---------------- */
+
+.fa-reveal {
+  position: relative;
+  border: 1px solid rgb(201 163 95 / 0.16);
+  background: linear-gradient(180deg, rgb(9 14 12 / 0.9), rgb(7 10 8 / 0.86));
+  padding: 11px;
+}
+
+.fa-reveal:focus-visible {
+  outline: 1px solid rgb(134 239 199 / 0.6);
+  outline-offset: 3px;
+}
+
+.fa-unseal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.fa-frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgb(201 163 95 / 0.16);
+  background: #0d1013;
 }
 
 .fa-shot {
   object-fit: cover;
-  object-position: top;
-  opacity: 0;
-  filter: brightness(0.78) grayscale(0.2);
-  transform: scale(1.06) translate3d(0, 1.5%, 0);
-  transition:
-    transform 950ms cubic-bezier(0.22, 1, 0.36, 1) var(--fa-delay, 0ms),
-    opacity 780ms ease-out var(--fa-delay, 0ms),
-    filter 620ms ease-out;
+  object-position: top center;
 }
 
-.fa-card[data-visible="true"] .fa-shot {
-  opacity: 1;
-  transform: none;
-}
-
-.fa-card:hover .fa-shot,
-.fa-card:focus-visible .fa-shot {
-  filter: brightness(0.95) grayscale(0);
-  transform: scale(1.04);
-}
-
-.fa-media-scrim {
+.fa-frame::after {
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgb(7 8 6 / 0.78), transparent 62%);
-  opacity: 0.9;
-  transition: opacity 500ms ease-out;
+  pointer-events: none;
+  background: linear-gradient(to top, rgb(7 10 8 / 0.72), transparent 56%);
 }
 
-.fa-card:hover .fa-media-scrim,
-.fa-card:focus-visible .fa-media-scrim {
-  opacity: 0.75;
-}
-
-.fa-open {
+.fa-frame-light {
   position: absolute;
-  right: 12px;
-  top: 12px;
-  display: flex;
-  height: 32px;
-  width: 32px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgb(237 231 218 / 0.16);
-  background: rgb(7 8 6 / 0.72);
-  color: rgb(237 231 218 / 0.9);
-  transition:
-    border-color 320ms ease-out,
-    color 320ms ease-out;
+  inset: -20%;
+  pointer-events: none;
+  background: linear-gradient(
+    104deg,
+    transparent 38%,
+    rgb(209 250 229 / 0.16) 48%,
+    rgb(134 239 199 / 0.08) 54%,
+    transparent 64%
+  );
+  opacity: 0;
+  mix-blend-mode: screen;
 }
 
-.fa-card:hover .fa-open,
-.fa-card:focus-visible .fa-open {
+.fa-frame-bracket {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
   border-color: rgb(201 163 95 / 0.55);
-  color: rgb(232 205 152);
+}
+
+.fa-frame-bracket-tl {
+  left: 10px;
+  top: 10px;
+  border-left: 1px solid;
+  border-top: 1px solid;
+}
+
+.fa-frame-bracket-br {
+  right: 10px;
+  bottom: 10px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.fa-frame-code {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgb(209 250 229 / 0.72);
 }
 
 .fa-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  padding: 18px 20px 20px;
+  padding: 16px 4px 4px;
 }
 
-.fa-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.fa-title {
-  margin: 0;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 1.6rem;
-  font-weight: 300;
-  line-height: 1.12;
-  color: rgb(237 231 218);
-}
-
-/* The title unmasks from below: the mask clips, the text moves. */
-.fa-title-mask {
-  display: block;
-  overflow: hidden;
-  padding-bottom: 0.06em;
-}
-
-.fa-title-text {
-  display: inline-block;
-  transform: translate3d(0, 108%, 0);
-  transition: transform 820ms cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--fa-delay, 0ms) + 110ms);
-}
-
-.fa-card[data-visible="true"] .fa-title-text {
-  transform: none;
-}
-
-.fa-title-mask::after {
-  content: "";
-  display: block;
-  height: 1px;
-  margin-top: 7px;
-  background: linear-gradient(90deg, rgb(201 163 95 / 0.62), transparent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--fa-delay, 0ms) + 260ms);
-}
-
-.fa-card[data-visible="true"] .fa-title-mask::after {
-  transform: scaleX(1);
-}
-
-.fa-index {
-  flex: none;
+.fa-record-kicker {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 8px;
-  letter-spacing: 0.2em;
-  color: rgb(216 212 200 / 0.4);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgb(201 163 95 / 0.72);
 }
 
-.fa-index-total {
-  color: rgb(216 212 200 / 0.22);
+.fa-record-title {
+  margin-top: 8px;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.85rem, 6vw, 2.4rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: rgb(246 238 218);
 }
 
-.fa-description {
+.fa-record-desc {
   margin-top: 9px;
-  font-size: 12px;
-  line-height: 1.75;
-  color: rgb(216 212 200 / 0.66);
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition:
-    opacity 700ms ease-out calc(var(--fa-delay, 0ms) + 190ms),
-    transform 700ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(var(--fa-delay, 0ms) + 190ms);
+  max-width: 34rem;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: rgb(216 212 200 / 0.72);
 }
 
-.fa-card[data-visible="true"] .fa-description {
-  opacity: 1;
-  transform: none;
-}
-
-.fa-stack,
-.fa-link {
-  opacity: 0;
-  transition: opacity 700ms ease-out calc(var(--fa-delay, 0ms) + 280ms);
-}
-
-.fa-card[data-visible="true"] .fa-stack,
-.fa-card[data-visible="true"] .fa-link {
-  opacity: 1;
-}
-
-.fa-stack {
+.fa-record-stack {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 12px;
-  margin-top: auto;
-  padding-top: 16px;
+  align-items: baseline;
+  gap: 5px 12px;
+  margin-top: 16px;
+  border-top: 1px solid rgb(201 163 95 / 0.12);
+  padding-top: 13px;
+}
+
+.fa-record-stack-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgb(201 163 95 / 0.66);
+}
+
+.fa-record-stack ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 11px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 8px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgb(216 212 200 / 0.46);
+  color: rgb(216 212 200 / 0.62);
 }
 
-.fa-link {
-  display: flex;
+.fa-enter {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-top: 16px;
-  border-top: 1px solid rgb(201 163 95 / 0.1);
-  padding-top: 12px;
+  border: 1px solid rgb(201 163 95 / 0.4);
+  padding: 11px 16px;
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 8px;
-  letter-spacing: 0.18em;
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgb(201 163 95 / 0.68);
+  color: rgb(246 238 218 / 0.92);
   transition:
-    opacity 700ms ease-out calc(var(--fa-delay, 0ms) + 280ms),
-    color 320ms ease-out;
+    border-color 300ms ease-out,
+    background 300ms ease-out,
+    color 300ms ease-out,
+    gap 300ms ease-out;
 }
 
-.fa-card:hover .fa-link,
-.fa-card:focus-visible .fa-link {
-  color: rgb(232 205 152);
+.fa-enter:hover,
+.fa-enter:focus-visible {
+  gap: 12px;
+  border-color: rgb(134 239 199 / 0.6);
+  background: rgb(134 239 199 / 0.08);
+  color: rgb(236 254 255);
 }
 
-.fa-link-arrow {
-  transition: transform 320ms ease-out;
+/* The unsealing: the record settles in and the barrier light sweeps across.
+   Opacity and transform only — no clip — so even if a device stalls the
+   timeline the record is legible rather than half-masked. */
+@media (prefers-reduced-motion: no-preference) {
+  .fa[data-inview="true"] .fa-unseal {
+    animation: fa-unseal 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .fa[data-inview="true"] .fa-unseal .fa-frame {
+    animation: fa-frame-open 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .fa[data-inview="true"] .fa-unseal .fa-frame-light {
+    animation: fa-sweep 900ms ease-out 140ms both;
+  }
+
+  .fa[data-inview="true"] .fa-ring-a {
+    animation: fa-turn 132s linear infinite;
+  }
+
+  .fa[data-inview="true"] .fa-ring-b {
+    animation: fa-turn 96s linear infinite reverse;
+  }
+
+  .fa[data-inview="true"] .fa-ring-c {
+    animation: fa-turn 68s linear infinite;
+  }
+
+  .fa[data-inview="true"] .fa-scan {
+    animation: fa-scan-drift 13s ease-in-out infinite;
+  }
+
+  .fa[data-inview="true"] .fa-ember {
+    animation: fa-ember-rise 15s linear var(--fa-ember-delay, 0s) infinite;
+  }
 }
 
-.fa-card:hover .fa-link-arrow,
-.fa-card:focus-visible .fa-link-arrow {
-  transform: translate3d(2px, -2px, 0);
+@keyframes fa-unseal {
+  from {
+    opacity: 0.42;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fa-frame-open {
+  from {
+    transform: scale(1.035);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes fa-sweep {
+  0% {
+    opacity: 0;
+    transform: translate3d(-38%, 0, 0);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(38%, 0, 0);
+  }
+}
+
+@keyframes fa-turn {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes fa-scan-drift {
+  0%,
+  100% {
+    transform: translate3d(0, -22%, 0);
+    opacity: 0.32;
+  }
+  50% {
+    transform: translate3d(0, 168%, 0);
+    opacity: 0.6;
+  }
+}
+
+@keyframes fa-ember-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.6);
+  }
+  18% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(6px, -70px, 0) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fa-shot,
-  .fa-title-text,
-  .fa-description,
-  .fa-stack,
-  .fa-link {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
+  .fa-ring,
+  .fa-scan,
+  .fa-ember,
+  .fa-unseal,
+  .fa-frame-light {
+    animation: none !important;
   }
 
-  .fa-title-mask::after {
-    transform: scaleX(1) !important;
-    transition: none !important;
+  .fa-frame-light {
+    opacity: 0;
   }
 
-  .fa-card:hover,
-  .fa-card:focus-visible {
-    transform: none;
+  .fa-seal,
+  .fa-enter {
+    transition: none;
   }
 }
 
@@ -10783,5 +11159,303 @@ p {
   .fyr-stage {
     padding-top: 88px;
     padding-bottom: 88px;
+  }
+}
+
+/* =========================================================================
+   PHASE 6.16 — COMPACT MISSION RECORDS
+
+   BugWiser and ResQ now use the short structure (problem/solution →
+   key implementation → stack/links). Chapters without a screenshot column
+   drop it instead of leaving a 220px hole, and the implementation lists
+   reuse the wind record's type scale.
+   ========================================================================= */
+
+.wnd-chapter--text {
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 2fr);
+}
+
+.wnd-stack-features {
+  display: grid;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.wnd-stack-features > li {
+  border-left: 1px solid rgb(var(--wnd-teal) / 0.22);
+  padding-left: 16px;
+}
+
+.wnd-feature-title {
+  margin-bottom: 4px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--wnd-aqua) / 0.86);
+}
+
+@media (max-width: 1023px) {
+  .wnd-chapter--text {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =========================================================================
+   PHASE 6.16 — PHONE HOME CONSTRUCTION VEIL
+
+   The still plate behind the DOM village is the finished render, so on a phone
+   the construction silhouettes were rising over an already-built village. This
+   single opaque overlay covers the plate for the construction beats and clears
+   when the world's final settle starts. Never rendered on desktop, and it is
+   one composited opacity transition — no filter, no extra layer budget.
+   ========================================================================= */
+
+.leaf-plate-veil {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .leaf-plate-veil {
+    position: absolute;
+    inset: 0;
+    display: block;
+    opacity: 1;
+    transition: opacity 1700ms ease-out;
+    background:
+      radial-gradient(ellipse 96% 66% at 50% 36%, rgb(6 8 11 / 0.52), transparent 72%),
+      linear-gradient(
+        to bottom,
+        rgb(6 8 11 / 0.87) 0%,
+        rgb(6 8 11 / 0.79) 46%,
+        rgb(6 8 11 / 0.72) 100%
+      );
+  }
+
+  [data-world-mode="live"] .leaf-plate-veil {
+    display: none;
+  }
+
+  [data-world-settled="true"] .leaf-plate-veil {
+    opacity: 0;
+  }
+
+  /* The phone script settles faster than the desktop one, so the diorama's
+     push-in is shortened to match (see COMPACT_STEPS). */
+  .lw-diorama {
+    transition-duration: 1700ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf-plate-veil {
+    transition: none;
+  }
+}
+
+/* =========================================================================
+   PHASE 6.16 — MOBILE MOTION BUDGET
+
+   Three perpetual animations were running for the whole life of the page on a
+   phone, and each of them held a permanent compositing layer:
+
+     .animate-seal    120s rotation of the large seal ring behind the portrait
+     .about-drift      70s drift of the full-section valley plate
+     .valley-mist      24s mist drift with an opacity ramp
+
+   At those durations none of them is perceptible on a phone, and all three are
+   replaced by their settled frame. The cinematic sequences (Flying Raijin,
+   Nature Chakra, Rasengan, Sand, Wind, Water, Fire) are untouched — this is a
+   budget cut on ambient drift, not on the main animations.
+   ========================================================================= */
+
+@media (max-width: 1023px) {
+  .animate-seal,
+  .about-drift,
+  .valley-mist {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+/* =========================================================================
+   PHASE 6.18 — PHONE ABOUT COMPOSITION
+
+   The About environment is the Valley of the End plate: 1672×941 (16:9) with a
+   Hokage statue almost on each edge. The phone band used to be `aspect-[4/3]`
+   with `object-cover`, which cropped ~12% of the width on each side and cut the
+   left statue in half. The section's `pt-[48svh]` also had no relationship to
+   the band's real height (292px on a 390×844 phone), so a dead band of ~110px
+   sat between the artwork and the heading.
+
+   Below 1024px the band is now a 16:10 window whose height is capped, so cover
+   only trims sky and foreground — never the statues — and the section's top
+   padding is derived from that same height. The band also stops being sticky on
+   a phone: the environment is a composed banner the copy follows, rather than a
+   pinned backdrop the text crawls over.
+   ========================================================================= */
+
+#about {
+  /* Just wider than the 16:9 plate, so `object-cover` trims a sliver of sky and
+     foreground and never the statues. */
+  --about-band-h: clamp(176px, 54vw, 380px);
+  padding-top: 58svh;
+}
+
+@media (min-width: 1024px) {
+  #about {
+    padding-top: 62svh;
+  }
+}
+
+@media (max-width: 1023px) {
+  #about {
+    padding-top: calc(var(--about-band-h) + 1.25rem);
+  }
+
+  .valley-band {
+    position: relative;
+    top: auto;
+    height: var(--about-band-h);
+    aspect-ratio: auto;
+  }
+
+  .valley-img {
+    object-position: 50% 46%;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  #about {
+    --about-band-h: clamp(260px, 53vw, 430px);
+  }
+}
+
+/* The scrim starts above the copy; on a phone the copy already begins below
+   the band, so it only needs to bridge the last few percent of it. */
+@media (max-width: 1023px) {
+  [data-about-scrim] {
+    top: -9svh;
+  }
+}
+
+/* =========================================================================
+   PHASE 6.18 — PHONE SAND DOMINION BUDGET
+
+   The BugWiser sand sequence looked like it was blinking on a phone, and the
+   measured cost explained why: on a 390×844 viewport with a 4× CPU throttle the
+   stage delivered ~19.8 painted frames per second (see
+   `scripts/probe-phase618-flicker.py`). Three properties were responsible, and
+   none of them is the choreography:
+
+   1. `will-change: transform, opacity` on every grain. There are up to 34 of
+      them, so the stage asked the compositor for 34 permanent layers on top of
+      the full-viewport gradients and blend groups. Mobile GPU memory pressure
+      is the classic source of layers that flash blank for a frame.
+   2. `mix-blend-mode` on `.bw-haze`, `.bw-aura`, `.bw-swirl`, `.bw-dune`,
+      `.bw-grain` and the speckle ribbon. A blend mode forces the whole isolated
+      stage into the slow paint path, so every animated child repaints the full
+      stage instead of compositing. On these near-black backgrounds `screen` on
+      a translucent warm layer is indistinguishable from normal alpha, so
+      dropping it on phones changes nothing visible.
+   3. Per-ribbon `stroke-dashoffset` drawing. Eleven paths across a 1440×900
+      box stretched to fill the stage re-raster the entire SVG every frame of
+      the 4.3s wave.
+
+   Phones keep the source, the ribbons, the parted sheets, the grains and the
+   copy beats — they lose the per-frame raster and the layer explosion. The
+   ribbons arrive with the wave (opacity + the existing group transforms)
+   instead of drawing themselves path by path. Desktop is untouched.
+   ========================================================================= */
+
+@media (max-width: 1023px) {
+  .bw-mote {
+    will-change: auto;
+  }
+
+  .bw-haze,
+  .bw-aura,
+  .bw-swirl,
+  .bw-dune,
+  .bw-grain,
+  .bw-ribbon-speckle {
+    mix-blend-mode: normal;
+  }
+}
+
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  .bw[data-active="true"] .bw-ribbon {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 0.82;
+  }
+}
+
+/* The phone intro no longer holds the copy back, so the skip control has
+   nothing to skip and was landing on the portrait. Desktop keeps it. */
+@media (max-width: 1023px) {
+  .skip-intro {
+    display: none;
+  }
+}
+
+/* Off-screen bindings that used to run for the life of the page. The Home
+   motes drift forever behind the whole document, and the ENN connector lines
+   animate their background position forever; both are now tied to the surface
+   being on screen. */
+@media (max-width: 1023px) {
+  .leaf-world[data-visible="false"] .lw-mote {
+    animation-play-state: paused;
+  }
+
+  .wtr-node::after {
+    animation: none !important;
+  }
+
+  .wtr[data-active="true"] .wtr-node::after {
+    animation: wtr-flow-y 8s linear infinite !important;
+  }
+}
+
+/* =========================================================================
+   PHASE 6.18 — PHONE DESIGN REFERENCES
+
+   The ResQ record's two interface designs were a 2-up grid below 640px: 185px
+   of screenshot each on a 390-wide phone with an 8px caption underneath. The
+   designs are the visual evidence for the project, so on a phone they become a
+   snapped filmstrip instead — each plate takes about four fifths of the width,
+   keeps its 486:1018 ratio, is centred when snapped, and the caption is set at
+   a readable size. The rail scrolls inside its own box, so the page never
+   overflows horizontally.
+   ========================================================================= */
+
+@media (max-width: 639px) {
+  .wnd-chapter-screens,
+  .wnd-chapter-screens.is-pair {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    margin-inline: -2px;
+    padding: 2px 2px 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--wnd-teal) / 0.45) transparent;
+  }
+
+  .wnd-chapter-screen {
+    flex: 0 0 min(80%, 320px);
+    scroll-snap-align: center;
+  }
+
+  .wnd-chapter-frame {
+    border-radius: 12px;
+  }
+
+  .wnd-chapter-caption {
+    margin-top: 10px;
+    font-size: 10px;
+    line-height: 1.65;
+    letter-spacing: 0.06em;
   }
 }

@@ -15,10 +15,14 @@ export default function FlyingRaijinLoader({
 }: FlyingRaijinLoaderProps) {
   const clamped = Math.max(0, Math.min(100, progress));
 
+  // PHASE 6.16 — phones never show the loader. Below 1024px the Home world has
+  // no WebGL scene to wait for, so the element would only be a black frame of
+  // SSR markup before hydration. Desktop keeps its intro unchanged.
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-700 ${
+      data-raijin-loader=""
+      className={`fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-black transition-opacity duration-700 lg:flex ${
         visible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >

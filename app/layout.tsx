@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Geist_Mono, Manrope } from "next/font/google";
 import { WorldProvider } from "@/components/worlds/WorldHost";
+import { profile, siteMetadata } from "@/lib/data/profile";
 import "./globals.css";
 import "./contact-world.css";
 
@@ -25,11 +26,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kasthuri Rangan | Frontend-Focused Full Stack Developer",
-  description:
-    "Portfolio of Kasthuri Rangan — a frontend-focused full stack developer building scalable interfaces, AI-powered applications and real-world integrations.",
-  authors: [{ name: "Kasthuri Rangan" }],
-  creator: "Kasthuri Rangan",
+  title: siteMetadata.title,
+  description: siteMetadata.description,
+  authors: [{ name: profile.name }],
+  creator: profile.name,
 };
 
 export const viewport: Viewport = {

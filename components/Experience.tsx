@@ -13,6 +13,22 @@ import { getSectionEnvironment } from "@/lib/worlds/environments";
 const EXP_ENV = getSectionEnvironment("experience");
 const EXP_ASSET = EXP_ENV.plate ?? "";
 
+const CHAPTER_WORDS = [
+  "Zero",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+];
+
+const TYPE_LABELS: Record<string, string> = {
+  "full-time": "Full-time",
+  internship: "Internship",
+  freelance: "Freelance",
+};
+
 const MONTHS = [
   "Jan",
   "Feb",
@@ -37,7 +53,7 @@ function formatMonth(value: string) {
 /**
  * Experience — the career chronicle.
  *
- * A parchment ledger of three chapters: a sticky archival rail on the left and
+ * A parchment ledger of chapters: a sticky archival rail on the left and
  * editorial records on the right. The environment is CSS only (no image
  * decode) and the only runtime work is one IntersectionObserver that marks
  * which chapter the reader is currently inside — no scroll listeners and no
@@ -191,7 +207,7 @@ export default function Experience() {
             index="05"
             label="Experience"
             title="A chronicle of teams, products and responsibilities."
-            description="From frontend internships to full-stack product work and client integrations — each chapter added a layer to how I build."
+            description="From full-stack internships to product engineering, client integrations and independent delivery — each chapter added a layer to how I build."
           />
         </Reveal>
 
@@ -222,10 +238,12 @@ export default function Experience() {
                   </div>
 
                   <p className="relative mt-4 font-display text-2xl font-light leading-tight text-bone/90">
-                    Three chapters
+                    {CHAPTER_WORDS[experiences.length] ?? experiences.length} chapters
                     <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.22em] text-ash/80">
                       {formatMonth(experiences[experiences.length - 1].start)} —{" "}
-                      {formatMonth(experiences[0].end)}
+                      {experiences[0].current
+                        ? "Present"
+                        : formatMonth(experiences[0].end)}
                     </span>
                   </p>
 
@@ -275,7 +293,9 @@ export default function Experience() {
                             <span className="min-w-0 pt-0.5">
                               <span className="block font-mono text-[9px] uppercase tracking-[0.18em] text-ash/80">
                                 {formatMonth(experience.start)} —{" "}
-                                {formatMonth(experience.end)}
+                                {experience.current
+                                  ? "Present"
+                                  : formatMonth(experience.end)}
                               </span>
                               <span
                                 className={`mt-1 block truncate text-sm leading-snug transition-colors duration-500 ${
@@ -369,14 +389,16 @@ export default function Experience() {
                               {formatMonth(experience.start)}
                             </time>
                             <span aria-hidden="true"> — </span>
-                            <time dateTime={experience.end}>
-                              {formatMonth(experience.end)}
-                            </time>
+                            {experience.current ? (
+                              <span>Present</span>
+                            ) : (
+                              <time dateTime={experience.end}>
+                                {formatMonth(experience.end)}
+                              </time>
+                            )}
                           </span>
                           <span className="border-l border-gold/25 pl-3 text-ash/80">
-                            {experience.type === "full-time"
-                              ? "Full-time"
-                              : "Internship"}
+                            {TYPE_LABELS[experience.type] ?? experience.type}
                           </span>
                           {isLatest ? (
                             <span className="ml-1 border border-gold/30 bg-gold/[0.07] px-2 py-1 text-[8px] tracking-[0.22em] text-gold-soft">

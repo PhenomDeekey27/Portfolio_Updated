@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useReveal,
   type RevealPhase,
@@ -126,12 +126,30 @@ function HouseShape({
 export default function MobileLeafWorld() {
   const { phase, markSceneReady } = useReveal();
   const [reduced, setReduced] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
 
-  // There is no WebGL scene on this path to report readiness, so the layer
-  // reports it — otherwise the intro waits out the controller's 9s fallback and
-  // the phone sits on the loader.
+  // PHASE 6.18 — the six motes used to drift for the life of the document,
+  // long after the Home section scrolled away. One observer pauses them when
+  // the world is off screen; nothing else here loops.
   useEffect(() => {
-    const timer = window.setTimeout(() => markSceneReady(), 800);
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => setVisible(entries[entries.length - 1]?.isIntersecting ?? false),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // There is no WebGL scene on this path to report readiness. PHASE 6.16: the
+  // controller starts the compact sequence on mount, so this is only a fallback
+  // (desktop-width reduced-motion visitors also land on the DOM world). The
+  // timer is short so the layer is ready long before the first construction
+  // phase needs it.
+  useEffect(() => {
+    const timer = window.setTimeout(() => markSceneReady(), 260);
     return () => window.clearTimeout(timer);
   }, [markSceneReady]);
 
@@ -148,8 +166,10 @@ export default function MobileLeafWorld() {
 
   return (
     <div
+      ref={rootRef}
       aria-hidden="true"
       className="leaf-world"
+      data-visible={visible ? "true" : "false"}
       data-ready={on(1)}
       data-mountains={on(2)}
       data-terrain={on(3)}

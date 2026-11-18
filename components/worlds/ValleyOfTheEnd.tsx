@@ -70,14 +70,24 @@ export default function ValleyOfTheEnd({
       className={`pointer-events-none absolute inset-0 overflow-clip bg-[#07111F] ${revealed ? "opacity-100" : "opacity-0"} transition-opacity duration-700 ease-out`}
     >
       {/* Sticky image band — tracks the viewport so the valley stays in
-          frame for the whole section without cropping the statues. */}
-      <div className="sticky top-0 aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:h-[100svh]">
+          frame for the whole section without cropping the statues.
+
+          PHASE 6.18 — the phone band is its own composition, not a 4:3 crop of
+          the desktop plate. The artwork is 16:9 and the two Hokage statues sit
+          almost on its left and right edges, so a 4:3 band cropped ~12% off
+          each side and cut the left statue in half. Below 1024px the band is
+          now a shorter 16:10 window (`--about-band-h`, see globals.css): wider
+          than tall relative to the art, so `object-cover` only trims the sky
+          and the foreground and both statues stay whole. The section's top
+          padding is driven by the same variable, so the environment and the
+          copy meet exactly instead of leaving a dead band between them. */}
+      <div className="valley-band sticky top-0 w-full overflow-hidden">
         <img
           src={ASSET}
           alt=""
           onLoad={handleImageLoad}
           onError={handleImageError}
-          className="h-full w-full object-cover object-[center_42%]"
+          className="valley-img h-full w-full object-cover object-[center_42%]"
           aria-hidden="true"
           decoding="async"
           loading="eager"

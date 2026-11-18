@@ -58,7 +58,7 @@ export default function Skills() {
               index="03"
               label="Skills"
               title="Shinobi Skill Records"
-              description="A training archive of the tools and disciplines I use to turn problems into shipped interfaces."
+              description="Four chapters of the toolkit behind the work — application engineering, backend and data systems, cloud integrations and AI workflows."
             />
           </Reveal>
         </div>

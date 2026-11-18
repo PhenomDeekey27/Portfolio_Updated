@@ -60,14 +60,14 @@ export default function Footer() {
                   KASTHURI RANGAN
                 </p>
                 <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.26em] text-ash/50">
-                  Frontend-focused full stack developer
+                  {profile.role}
                 </p>
               </div>
             </div>
 
             <p className="mt-5 max-w-sm text-xs leading-6 text-ash/55">
-              Building interfaces and systems with intent — from Tamil Nadu,
-              for the web.
+              Building complete products and AI-assisted systems — from Tamil
+              Nadu, for the web.
             </p>
           </div>
 

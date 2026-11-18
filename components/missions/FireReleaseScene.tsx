@@ -488,13 +488,24 @@ export default function FireReleaseScene({
 
             <div className="fyr-panel-stack">
               <Reveal className="fyr-panel" delay={140}>
-                <p className="fyr-panel-label">Stack</p>
+                <p className="fyr-panel-label">Technology</p>
                 <ul className="fyr-stack">
                   {mission.stack.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
               </Reveal>
+
+              {mission.integrations?.length ? (
+                <Reveal className="fyr-panel" delay={170}>
+                  <p className="fyr-panel-label">Integrations</p>
+                  <ul className="fyr-stack" aria-label="External integrations">
+                    {mission.integrations.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </Reveal>
+              ) : null}
 
               <Reveal className="fyr-panel fyr-panel-quiet" delay={200}>
                 <p className="fyr-panel-label">What this record does not claim</p>

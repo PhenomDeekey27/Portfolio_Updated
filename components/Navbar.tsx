@@ -132,7 +132,12 @@ export default function Navbar() {
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-700 ${
           navVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
         } ${scrolled
-          ? "border-b border-bone/10 bg-void/[0.88] py-3 backdrop-blur-xl"
+          ? // PHASE 6.16 — phones get an opaque bar instead of a full-width
+            // `backdrop-filter`. A live blur across a 390px header is
+            // recomputed on every scroll frame while the page moves behind it;
+            // at 0.94 opacity the difference is not visible, and desktop keeps
+            // the blurred bar it has always had.
+            "border-b border-bone/10 bg-void/[0.94] py-3 lg:bg-void/[0.88] lg:backdrop-blur-xl"
           : "border-b border-transparent bg-transparent py-5"
         }`}
       >

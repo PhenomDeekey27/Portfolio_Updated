@@ -2,14 +2,14 @@ export const profile = {
   name: "Kasthuri Rangan",
   displayName: "KASTHURI RANGAN",
   initials: "KR",
-  role: "Frontend-Focused Full Stack Developer",
+  role: "AI-focused Full-Stack Software Developer",
   location: "Villupuram, Tamil Nadu, India",
   email: "krangan415@gmail.com",
   phone: "+91 6385685891",
   phoneHref: "tel:+916385685891",
   availability: "Open to new opportunities",
   intro:
-    "I build thoughtful digital experiences, scalable interfaces and AI-powered applications that solve real-world problems.",
+    "I build complete products — React and Next.js on the surface, FastAPI and Node services behind it, and AI woven in where it makes the software genuinely more useful.",
   resumeUrl:
     "https://drive.google.com/file/d/17umHQ9R7W_B6KSvReACB4DP0fcQmEZlZ/view?usp=drive_link",
   links: {
@@ -21,17 +21,24 @@ export const profile = {
 } as const;
 
 export const siteMetadata = {
-  title: "Kasthuri Rangan | Frontend-Focused Full Stack Developer",
+  title: "Kasthuri Rangan | AI-focused Full-Stack Software Developer",
   description:
-    "Portfolio of Kasthuri Rangan — a frontend-focused full stack developer building scalable interfaces, AI-powered applications and real-world integrations.",
+    "Portfolio of Kasthuri Rangan — an AI-focused full-stack software developer building complete applications, backend APIs, integrations and AI-powered workflows.",
   keywords: [
     "Kasthuri Rangan",
-    "Frontend Developer",
-    "Full Stack Developer",
+    "AI-focused Full-Stack Software Developer",
+    "Full Stack Software Developer",
+    "AI Application Development",
+    "Backend APIs",
+    "AI Integrations",
     "React",
     "Next.js",
     "TypeScript",
-    "AI Integrations",
+    "Node.js",
+    "FastAPI",
+    "LLM integrations",
+    "RAG",
+    "Supabase",
     "Developer Portfolio",
   ],
 } as const;
