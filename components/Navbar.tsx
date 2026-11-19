@@ -8,6 +8,7 @@ import KunaiMark from "./motifs/KunaiMark";
 import { profile } from "@/lib/data/profile";
 import { useReveal } from "@/components/transitions/WorldRevealController";
 import { useTeleport } from "@/components/transitions/TeleportationController";
+import { sectionPath } from "@/lib/routes";
 
 const navItems = [
   { id: "home", label: "Home", index: "01" },
@@ -114,14 +115,24 @@ export default function Navbar() {
   const { beginTransition } = useTeleport();
   const handleNavigate = useCallback(
     (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+      // Modified clicks keep the browser's behaviour; every section is a real
+      // URL (`/skills`, `/missions`, …) so new-tab and copy-link work.
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        event.button !== 0
+      ) {
+        return;
+      }
       event.preventDefault();
       setIsOpen(false);
-      // TeleportationController owns scrolling now: for Home<->About it
-      // scrolls under opaque black during the flash; for other sections it
-      // uses the normal smooth scroll. Never scroll immediately or the About
-      // world would slide in before the black cover settles.
+      // TeleportationController owns scrolling and the address bar now: for
+      // adjacent sections it scrolls under opaque cover during the flash; for
+      // other sections it uses the normal smooth scroll. Never scroll
+      // immediately or the About world would slide in before the cover settles.
       beginTransition(id);
-      window.history.replaceState(null, "", `#${id}`);
     },
     [beginTransition]
   );
@@ -143,7 +154,7 @@ export default function Navbar() {
       >
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <a
-            href="#home"
+            href={sectionPath("home")}
             onClick={(event) => handleNavigate(event, "home")}
             className="group flex items-center gap-3"
             aria-label="Kasthuri Rangan — back to home"
@@ -170,7 +181,7 @@ export default function Navbar() {
               return (
                 <a
                   key={item.id}
-                  href={`#${item.id}`}
+                  href={sectionPath(item.id)}
                   onClick={(event) => handleNavigate(event, item.id)}
                   aria-current={isActive ? "page" : undefined}
                   className={`group relative flex items-baseline gap-1.5 py-2 text-[13px] transition-colors duration-300 ${
@@ -260,7 +271,7 @@ export default function Navbar() {
                 return (
                   <motion.a
                     key={item.id}
-                    href={`#${item.id}`}
+                    href={sectionPath(item.id)}
                     onClick={(event) => handleNavigate(event, item.id)}
                     aria-current={isActive ? "page" : undefined}
                     initial={

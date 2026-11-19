@@ -100,9 +100,20 @@ const COMPACT_STEPS: { phase: RevealPhase; ms: number }[] = [
   { phase: "COMPLETE", ms: 0 },
 ];
 
-export function WorldRevealController({ children }: { children: ReactNode }) {
+export function WorldRevealController({
+  children,
+  initialSection = "home",
+}: {
+  children: ReactNode;
+  /** Section the document opened on; section routes skip the Home intro. */
+  initialSection?: string;
+}) {
   const [phase, setPhase] = useState<RevealPhase>(() =>
-    shouldPlayIntro() ? "LOADING" : "COMPLETE"
+    initialSection !== "home"
+      ? "COMPLETE"
+      : shouldPlayIntro()
+        ? "LOADING"
+        : "COMPLETE"
   );
   const [reducedMotion] = useState(() =>
     typeof window === "undefined"

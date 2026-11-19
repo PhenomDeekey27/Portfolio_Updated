@@ -21,6 +21,7 @@ export const profile = {
 } as const;
 
 export const siteMetadata = {
+  url: "https://portfolio-updated-sooty.vercel.app",
   title: "Kasthuri Rangan | AI-focused Full-Stack Software Developer",
   description:
     "Portfolio of Kasthuri Rangan — an AI-focused full-stack software developer building complete applications, backend APIs, integrations and AI-powered workflows.",

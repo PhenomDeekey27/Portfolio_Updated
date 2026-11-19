@@ -10,8 +10,12 @@
 //   Missions ⇄ Experience  Shinobi Chronicle Map Reveal
 //   Experience ⇄ Contact   Hokage Message Summoning (Phase 6.12)
 //
-// Any other pair (a nav jump between non-adjacent sections) falls back to the
-// base Flying Raijin teleport, which is the site's global travel identity.
+// Non-adjacent travels (a nav jump, or a menu tap on a phone that skips the
+// sections in between) use the identity of the section being entered. Before
+// this, every one of those jumps fell back to the same Flying Raijin kunai —
+// which made every phone menu navigation look identical even though desktop
+// scrolling showed a different effect per section. The destination identity
+// keeps the arrival distinct no matter where the visitor jumped from.
 
 export type TransitionKind =
   | "raijin"
@@ -51,14 +55,29 @@ const ROUTE_IDENTITY: Record<string, RouteIdentity> = {
 
 const FALLBACK: RouteIdentity = { kind: "raijin", label: "Flying Raijin" };
 
+/**
+ * Arrival identity per destination. Used for jumps that skip sections, so the
+ * animation still belongs to the section the visitor is entering.
+ */
+const DESTINATION_IDENTITY: Record<string, RouteIdentity> = {
+  home: { kind: "raijin", label: "Flying Raijin" },
+  about: { kind: "raijin", label: "Flying Raijin" },
+  skills: { kind: "nature-chakra", label: "Nature Chakra Awakening" },
+  missions: { kind: "rasengan", label: "Jutsu / Rasengan" },
+  experience: { kind: "shinobi-map", label: "Shinobi Chronicle Map" },
+  contact: { kind: "hokage-summon", label: "Hokage Message Summoning" },
+};
+
 export function getRouteIdentity(
   source: string | null,
   destination: string | null
 ): RouteIdentity {
-  if (!source || !destination) return FALLBACK;
+  if (!destination) return FALLBACK;
+  if (!source) return DESTINATION_IDENTITY[destination] ?? FALLBACK;
   return (
     ROUTE_IDENTITY[`${source}|${destination}`] ??
     ROUTE_IDENTITY[`${destination}|${source}`] ??
+    DESTINATION_IDENTITY[destination] ??
     FALLBACK
   );
 }

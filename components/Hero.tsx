@@ -27,19 +27,17 @@ function useMediaQuery(query: string) {
 }
 
 /**
- * PHASE 6.18 — the copy leads on a phone.
+ * PHASE 6.19 — the record no longer waits for the village.
  *
- * Above 1024px the record still arrives on its own phase (`HERO_TEXT_REVEAL`),
- * after the village has been built: that is the desktop composition and it is
- * unchanged.
+ * On a desktop the copy was gated on the construction script: the loader
+ * cleared, the village built, and only after `HERO_TEXT_REVEAL` (~7s of phases)
+ * did the first line appear. The visitor watched an establishing shot before
+ * learning whose portfolio it was.
  *
- * On a phone the same phase arrived ~3.4s in, and only then did a single block
- * of copy fade up — so the visitor watched a background settle before learning
- * whose portfolio it was. The phone now releases the copy as soon as the
- * construction sequence starts (`phase !== "LOADING"`), and the village keeps
- * building, lighting and settling behind it. The hierarchy is carried by the
- * staggered delays instead of by waiting: name, then role, then introduction,
- * then the calls to action, each within a second of the first frame.
+ * Both phone and desktop now release the copy as soon as the construction
+ * sequence starts (`phase !== "LOADING"`). The village keeps building, lighting
+ * and settling behind it. The hierarchy is carried by the staggered delays
+ * instead of by waiting: name, role, introduction, calls to action.
  *
  * Reduced motion collapses every delay to zero and the whole record is simply
  * there.
@@ -49,28 +47,17 @@ export default function Hero() {
   const compact = useMediaQuery("(max-width: 1023px)");
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
-  // PHASE 6.18 — one owner per property. These elements used to carry BOTH the
-  // `.hero-rise` mount animation and an inline phase transition on opacity, and
-  // a CSS animation outranks an inline style: by the time the copy was released
-  // the rise had already finished, so the record arrived as a single block with
-  // no hierarchy. The phase-gated items below keep only the inline transition;
+  // One owner per property. These elements used to carry BOTH the `.hero-rise`
+  // mount animation and an inline phase transition on opacity, and a CSS
+  // animation outranks an inline style: by the time the copy was released the
+  // rise had already finished, so the record arrived as a single block with no
+  // hierarchy. The phase-gated items below keep only the inline transition;
   // the kicker and the footer row, which are not phase-gated, keep `.hero-rise`.
   const started = phase !== "LOADING";
-  const contentVisible = compact
-    ? started
-    : phase === "HERO_TEXT_REVEAL" ||
-      phase === "PORTRAIT_REVEAL" ||
-      phase === "CTA_REVEAL" ||
-      phase === "COMPLETE";
-  const metadataVisible = contentVisible;
-  const portraitVisible = compact
-    ? started
-    : phase === "PORTRAIT_REVEAL" ||
-      phase === "CTA_REVEAL" ||
-      phase === "COMPLETE";
-  const ctaVisible = compact
-    ? started
-    : phase === "CTA_REVEAL" || phase === "COMPLETE";
+  const contentVisible = started;
+  const metadataVisible = started;
+  const portraitVisible = started;
+  const ctaVisible = started;
 
   /** Phone delays are tighter than the desktop ones; reduced motion has none. */
   const delay = (desktopMs: number, phoneMs: number) =>
@@ -203,7 +190,7 @@ export default function Hero() {
                         : "translateY(0.6rem)",
                       transitionDelay: reducedMotion
                         ? "0ms"
-                        : `${(compact ? 420 : 1000) + i * (compact ? 70 : 120)}ms`,
+                        : `${(compact ? 420 : 380) + i * (compact ? 70 : 120)}ms`,
                     }}
                   >
                     {word}
@@ -217,7 +204,7 @@ export default function Hero() {
               style={{
                 opacity: contentVisible ? 1 : 0,
                 transform: contentVisible ? "translateY(0)" : "translateY(0.8rem)",
-                transitionDelay: delay(1000, 560),
+                transitionDelay: delay(520, 560),
               }}
             >
               {profile.intro}
@@ -228,7 +215,7 @@ export default function Hero() {
               style={{
                 opacity: ctaVisible ? 1 : 0,
                 transform: ctaVisible ? "translateY(0)" : "translateY(0.8rem)",
-                transitionDelay: delay(200, 840),
+                transitionDelay: delay(680, 840),
                 pointerEvents: ctaVisible ? "auto" : "none",
               }}
             >

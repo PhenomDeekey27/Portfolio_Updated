@@ -17,6 +17,13 @@ import {
 } from "@/lib/transitions/teleportation";
 import { getRouteIdentity } from "@/lib/transitions/identity";
 import { scrollToSection, scrollToSectionInstant, setScrollLocked } from "@/lib/scroll";
+import {
+  SECTION_IDS,
+  isSectionId,
+  sectionFromPath,
+  sectionPath,
+  type SectionId,
+} from "@/lib/routes";
 import KunaiTransition from "./KunaiTransition";
 import NatureChakraTransition from "./NatureChakraTransition";
 import RasenganTransition from "./RasenganTransition";
@@ -60,8 +67,6 @@ export function useSectionRevealPhase(id: string): SectionRevealPhase {
   return useTeleport().sectionPhase(id);
 }
 
-const SECTION_IDS = ["home", "about", "skills", "missions", "experience", "contact"];
-
 /**
  * Sections whose environment is only mounted for the visitor AFTER they arrive.
  * They stay hidden while idle so the environment is never glimpsed sliding in
@@ -76,11 +81,23 @@ const COVER_PHASES = new Set<TeleportState>([
   "TELEPORT_FLASH",
 ]);
 
-export function TeleportationController({ children }: { children: ReactNode }) {
+interface TeleportationControllerProps {
+  children: ReactNode;
+  /**
+   * Section the document was opened on. `/skills` and friends are real routes,
+   * so the server tells the controller where the visitor landed.
+   */
+  initialSection?: SectionId;
+}
+
+export function TeleportationController({
+  children,
+  initialSection = "home",
+}: TeleportationControllerProps) {
   const reducedMotion = useReducedMotion() ?? false;
   const teleport = useTeleportation(reducedMotion);
-  const [activeSection, setActiveSection] = useState("home");
-  const activeRef = useRef("home");
+  const [activeSection, setActiveSection] = useState<string>(initialSection);
+  const activeRef = useRef<SectionId>(initialSection);
   const teleportRef = useRef(teleport);
   const cooldownUntilRef = useRef(0);
   const pendingDestinationRef = useRef<string | null>(null);
@@ -147,39 +164,133 @@ export function TeleportationController({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, []);
 
-  const beginTransition = useCallback((destination: string) => {
-    const source = activeRef.current;
-    if (destination === source) {
-      // Same section: plain anchor scroll, no teleport.
-      scrollToSection(destination);
-      return;
-    }
+  /**
+   * Keep the address bar in step with the document.
+   *
+   * Explicit navigation (nav menu, section links) pushes a history entry so the
+   * browser back button can return to the previous section. Scroll crossings
+   * replace the current entry, so simply reading the page does not fill the
+   * history stack.
+   */
+  const syncUrl = useCallback(
+    (destination: SectionId, mode: "push" | "replace") => {
+      if (typeof window === "undefined") return;
+      const path = sectionPath(destination);
+      if (window.location.pathname === path && window.location.hash === "") return;
+      const method = mode === "push" ? "pushState" : "replaceState";
+      window.history[method]({ section: destination }, "", path);
+    },
+    []
+  );
 
-    // A hidden document should not animate. Move and reveal instantly.
-    if (document.visibilityState === "hidden") {
-      activeRef.current = destination;
-      setActiveSection(destination);
-      scrollToSectionInstant(destination);
-      return;
-    }
+  const navigate = useCallback(
+    (destination: string, updateHistory: boolean) => {
+      const source = activeRef.current;
 
-    // A sequence is already running? beginTransition rejects and we replay
-    // the latest request once the current sequence resets. Never overlap.
-    if (isTeleportPair(source, destination)) {
-      const accepted = teleportRef.current.beginTransition(destination, source);
-      if (!accepted) {
-        pendingDestinationRef.current = destination;
+      if (!isSectionId(destination)) {
+        // Unknown targets keep normal smooth scrolling (defensive fallback).
+        scrollToSection(destination);
         return;
       }
-      activeRef.current = destination;
-      setActiveSection(destination);
-    } else {
-      // Unknown targets keep normal smooth scrolling (defensive fallback).
-      activeRef.current = destination;
-      setActiveSection(destination);
-      scrollToSection(destination);
+
+      if (destination === source) {
+        // Same section: plain scroll, no teleport. Still repair a fragment URL.
+        if (updateHistory) syncUrl(destination, "replace");
+        scrollToSection(destination);
+        return;
+      }
+
+      // A hidden document should not animate. Move and reveal instantly.
+      if (document.visibilityState === "hidden") {
+        activeRef.current = destination;
+        setActiveSection(destination);
+        scrollToSectionInstant(destination);
+        if (updateHistory) syncUrl(destination, "replace");
+        return;
+      }
+
+      // A sequence is already running? beginTransition rejects and we replay
+      // the latest request once the current sequence resets. Never overlap.
+      if (isTeleportPair(source, destination)) {
+        const accepted = teleportRef.current.beginTransition(destination, source);
+        if (!accepted) {
+          pendingDestinationRef.current = destination;
+          return;
+        }
+        activeRef.current = destination;
+        setActiveSection(destination);
+        if (updateHistory) syncUrl(destination, "push");
+      } else {
+        activeRef.current = destination;
+        setActiveSection(destination);
+        scrollToSection(destination);
+        if (updateHistory) syncUrl(destination, "replace");
+      }
+    },
+    [syncUrl]
+  );
+
+  const beginTransition = useCallback(
+    (destination: string) => navigate(destination, true),
+    [navigate]
+  );
+
+  // Opening a section path directly (`/skills`) is a real route: land on that
+  // section instead of the top of the page. Legacy `#skills` fragments are
+  // migrated to the canonical path at the same time.
+  useEffect(() => {
+    const hashId = window.location.hash.slice(1);
+    const legacy = isSectionId(hashId) ? hashId : null;
+    if (legacy) {
+      window.history.replaceState(
+        { section: legacy },
+        "",
+        sectionPath(legacy)
+      );
     }
-  }, []);
+
+    const destination: SectionId | null = legacy
+      ? legacy
+      : initialSection !== "home"
+        ? initialSection
+        : sectionFromPath(window.location.pathname);
+
+    if (!destination || destination === "home") return;
+
+    activeRef.current = destination;
+
+    // Fonts and the home image settle after the first paint and shift the
+    // document, so the section is aligned again once the layout is final.
+    const frame = window.requestAnimationFrame(() => {
+      setActiveSection(destination);
+      scrollToSectionInstant(destination);
+    });
+    const settle = window.setTimeout(
+      () => scrollToSectionInstant(destination),
+      350
+    );
+    const finalSettle = window.setTimeout(
+      () => scrollToSectionInstant(destination),
+      1000
+    );
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
+      window.clearTimeout(finalSettle);
+    };
+  }, [initialSection]);
+
+  // Browser back / forward: replay the section change without writing history.
+  useEffect(() => {
+    const onPopState = () => {
+      const destination = sectionFromPath(window.location.pathname);
+      if (!destination) return;
+      navigate(destination, false);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [navigate]);
 
   // Play a queued navigation once the current sequence has fully reset.
   useEffect(() => {
@@ -189,6 +300,7 @@ export function TeleportationController({ children }: { children: ReactNode }) {
     pendingDestinationRef.current = null;
     const source = activeRef.current;
     if (pending === source) return;
+    if (!isSectionId(pending)) return;
     if (document.visibilityState === "hidden") {
       activeRef.current = pending;
       setActiveSection(pending);
@@ -198,12 +310,13 @@ export function TeleportationController({ children }: { children: ReactNode }) {
     if (teleportRef.current.beginTransition(pending, source)) {
       activeRef.current = pending;
       setActiveSection(pending);
+      syncUrl(pending, "push");
     } else {
       // Another start won the same tick; keep it queued and let the next
       // reset (or the scroll retry) consume it.
       pendingDestinationRef.current = pending;
     }
-  }, [state]);
+  }, [state, syncUrl]);
 
   // Scroll-driven detection for every section pair.
   //
@@ -231,8 +344,9 @@ export function TeleportationController({ children }: { children: ReactNode }) {
       // transition was rejected.
       const accepted = teleportRef.current.beginTransition(destination, source);
       if (!accepted) return;
-      activeRef.current = destination;
+      activeRef.current = destination as SectionId;
       setActiveSection(destination);
+      if (isSectionId(destination)) syncUrl(destination, "replace");
     };
 
     const consider = () => {
@@ -309,7 +423,7 @@ export function TeleportationController({ children }: { children: ReactNode }) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, []);
+  }, [syncUrl]);
 
   const sectionPhase = useCallback(
     (id: string): SectionRevealPhase => {
